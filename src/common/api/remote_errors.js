@@ -1,0 +1,1 @@
+export const INVALID_MOBILE_VERIFICATION = 203
