@@ -31,7 +31,7 @@ function composeParams(model, options = {}){
 
 // *****************************************************
 
-const baseQuery = fetchBaseQuery({ baseUrl: `http://192.168.43.130` })  // TODO: read this from a configurable source!
+const baseQuery = fetchBaseQuery({ baseUrl: `http://192.168.86.179:8015` })  // TODO: read this from a configurable source!
 
 const baseQueryWithInterceptor  = async (args, api, extraOptions) => {
   /* this method is created only to capture odoo specific errors.
@@ -41,6 +41,7 @@ const baseQueryWithInterceptor  = async (args, api, extraOptions) => {
   */
   
   console.debug('### we are in the beam of baseQueryWithInterceptor');
+  console.debug(args);
   const response = await baseQuery(args, api, extraOptions)
   console.debug(response);
   if(response.error){
@@ -51,9 +52,11 @@ const baseQueryWithInterceptor  = async (args, api, extraOptions) => {
     if(responseStatus.ok){
       console.debug('### responseStatus is ok, will return data');
       return {
+        // TODO: continue from here, what should this method return in case of success?
         data: response.data.result.records
       }
     }else{
+      console.debug('### responseStatus is error');
       return {
         status: 'CUSTOM_ERROR',
         data: responseStatus,
@@ -99,12 +102,27 @@ export const odooApi = createApi({
       }),
       // Pick out data and prevent nested properties in a hook or selector
       transformResponse: (response, meta, arg) => response.data,
-
-    }
-    )
+    }),
+    login: builder.mutation({
+      query: (data) => ({
+        url: '/web/session/authenticate',
+        method: 'POST',
+        body: {
+          jsonrpc: "2.0",
+          method: "call",
+          params:  {
+            db: 'v15orphans',  // FIXME: make database name configurable
+            login: data.login,
+            password: data.password,
+          },
+        },
+      }),
+      // Pick out data and prevent nested properties in a hook or selector
+      transformResponse: (response, meta, arg) => response.data,
+    }),
   }),
 });
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetPartners, useWritePartnerMutation } = odooApi
+export const { useGetPartners, useWritePartnerMutation, useLoginMutation } = odooApi

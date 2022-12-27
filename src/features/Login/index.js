@@ -10,12 +10,14 @@ import { useYupValidationResolver } from '../../common/utils/commonComponentLogi
 import { FormProvider, useForm } from 'react-hook-form';
 import { getPassword, getUsername, savePassword, saveUsername } from '../../native-common/storage/secureStore';
 import * as LocalAuthentication from 'expo-local-authentication';
+import { useLoginMutation } from '../../common/store/reduxApi';
 
 export const PersonIcon = (style) => (
   <Icon {...style} fill="#CFD6E2" name='person' />
 );
 
 export default ({ navigation }) => {
+  const [loginMethod, loginResult] = useLoginMutation()
   const rememberMe = useState(false);  // FIXME: move remember me into a reusable redux, and use it in the remember me component instead of passing it from every auth related page
 
   const [passwordVisible, setPasswordVisible] = React.useState(false);
@@ -42,6 +44,8 @@ export default ({ navigation }) => {
   const onSignInButtonPress = async (data) => {
     setPasswordVisible(false);
     setIsLoading(true);
+    console.log('data')
+    console.log(data)
     const password = data.password;
     let login = data.login;
     if(!login.includes('@') && login && login[0] === 's'){
@@ -49,12 +53,9 @@ export default ({ navigation }) => {
     }
     try{
       login = login.trim();
-      // TODO: ACTUALLY CALL AUTH METHOD
-      // const response = await Auth(addError, login, password, getDefaultDatabase());
+      await loginMethod({login, password});
       const response = {};
-      setIsLoading(false);
       if(response){  // response is uid
-          // dispatch(updateLoginInfoAction({isLoggedIn: true, auth: response}));  // TODO: call mutation here
           if(rememberMe){
             saveUsername(login);
             savePassword(password);
@@ -65,6 +66,7 @@ export default ({ navigation }) => {
       }
     }catch (ex){
       addError('Login failed\n' + ex);  // translate me
+    }finally{
       setIsLoading(false);
     }
   };
