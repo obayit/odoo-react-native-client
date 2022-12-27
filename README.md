@@ -1,7 +1,22 @@
 # Odoo React Native Client
-This project is still in the early development stage, and major changes may(will) be applied.
+This project is still in the early development stage, and major changes will be applied.
 
 ### why react-native-svg is not in sync with expo version?
+
+### Used libraries
+* State Management: redux (RTK Query)
+* Navigation: React Navigation
+* Form data: React Hook Form
+
+## Features
+* Centralized Error Handling: errors can be triggered using a callback method provided by APIErrorContext context.
+
+### Milestones:
+* Field builder: build the _react-hook-form_ form using an object describing the field properties.
+* API: search_read, read
+* API: create, write, unlink
+* API: attachments
+* UI: UI Kitten custom mapping to match Odoo theme
 
 because the expo version causes an error for ui kitten eva icons, see: https://github.com/akveo/react-native-ui-kitten/issues/1675
 
