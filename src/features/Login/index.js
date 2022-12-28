@@ -13,11 +13,13 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import { useLoginMutation } from '../../common/store/reduxApi';
 
 export const PersonIcon = (style) => (
-  <Icon {...style} fill="#CFD6E2" name='person' />
+  <Icon {...style} name='person' />
 );
 
 export default ({ navigation }) => {
   const [loginMethod, loginResult] = useLoginMutation()
+  console.log('# loginResult');
+  console.log(JSON.stringify(loginResult, null, 2));
   const rememberMe = useState(false);  // FIXME: move remember me into a reusable redux, and use it in the remember me component instead of passing it from every auth related page
 
   const [passwordVisible, setPasswordVisible] = React.useState(false);
@@ -108,6 +110,9 @@ export default ({ navigation }) => {
     required: true,
     style: [reusableStyles.formControl, reusableStyles.transparentFormControl],
     labelStyle: reusableStyles.transparentFormControlLabel,
+    autoCapitalize: 'none',
+    size: 'large',
+    textStyle: reusableStyles.transparentFormControlLabel,
   }
 
   return (
@@ -128,9 +133,6 @@ export default ({ navigation }) => {
           <TextInput name='login' label='Email' {...commonInputProps}
           inputProps={{
             accessoryRight: PersonIcon,
-            autoCapitalize: 'none',
-            size: 'large',
-            textStyle: reusableStyles.transparentFormControlLabel,
             onSubmitEditing: () => passwordInput.current.focus(),
             }}/>
             {/* NOTE: see this to implement auto login on pressing enter, https://stackoverflow.com/a/35765465/3557761 */}
@@ -138,15 +140,13 @@ export default ({ navigation }) => {
           inputProps={{
             ref: passwordInput,
             accessoryRight: disablePasswordVisible ? null : (props) => renderPasswordIcon({onPress: onPasswordIconPress, passwordVisible, ...props}),
-            autoCapitalize: 'none',
             secureTextEntry: disablePasswordVisible || !passwordVisible,
-            size: 'large',
-            textStyle: reusableStyles.transparentFormControlLabel,
             onSubmitEditing: handleSubmit(onSignInButtonPress),
             }}/>
+            <Text>{JSON.stringify(loginResult)}</Text>
           {isLoading && <Loading status='control'/>}
         </FormProvider>
-        <Button disabled={isLoading} onPress={handleSubmit(onSignInButtonPress)}>Login</Button>
+        <Button disabled={isLoading} onPress={handleSubmit(onSignInButtonPress)} style={styles.submitButton}>Login</Button>
       </View>
     </LoginContainer>
   );
@@ -171,6 +171,9 @@ const themedStyles = StyleService.create({
   },
   forgotPassword: {
     marginTop: 0,
-  }
+  },
+  submitButton: {
+    marginTop: 10,
+  },
 });
 
