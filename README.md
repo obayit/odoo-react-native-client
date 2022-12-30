@@ -9,9 +9,9 @@ This is a managed expo project, run the following commands to start the developm
 
 ## Screenshots
 Login page
-![Login](docs/login.jpg | width=100)
+![Login](docs/login.jpg =853x250)
 Home page
-![Home](docs/login.jpg | width=100)
+![Home](docs/login.jpg =853x250)
 
 
 ### why react-native-svg is not in sync with expo version?
