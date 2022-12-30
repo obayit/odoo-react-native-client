@@ -1,6 +1,19 @@
 # Odoo React Native Client
 This project is still in the early development stage, and major changes will be applied.
 
+## How to run
+This is a managed expo project, run the following commands to start the development:
+
+`npm install`
+`npx expo start`
+
+## Screenshots
+Login page
+![Login](docs/login.jpg)
+Home page
+![Home](docs/login.jpg)
+
+
 ### why react-native-svg is not in sync with expo version?
 
 ### Used libraries

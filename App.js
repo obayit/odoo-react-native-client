@@ -7,6 +7,7 @@ import { AppNavigator } from './src/navigation/app.navigator';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux'
 import APIErrorProvider from './src/common/providers/APIErrorProvider';
+import { default as theme } from './theme/theme.json'; // <-- Import app theme
 import {
   Roboto_100Thin,
   Roboto_100Thin_Italic,
@@ -87,7 +88,7 @@ export default () => {
     <View style={{width: '100%', height: '100%'}} onLayout={onLayout}>
       <Provider store={store}>
         <IconRegistry icons={EvaIconsPack} />
-        <ApplicationProvider mapping={customMapping} theme={{ ...light}}>
+        <ApplicationProvider mapping={customMapping} theme={{ ...light, ...theme}}>
           <SafeAreaProvider>
             {/* <PersistGate loading={null} persistor={persistor}> */}
               <APIErrorProvider>

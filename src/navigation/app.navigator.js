@@ -1,28 +1,40 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { StyleService, useStyleSheet } from '@ui-kitten/components';
+import { StyleService, useStyleSheet, useTheme } from '@ui-kitten/components';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // features (aka scenes, aka pages)
 import Login from '../features/Login'
+import { useSelector } from 'react-redux';
+import { selectAuth } from '../common/store/authSlice';
+import Home from '../features/Home';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
+const useHeaderOptions = () => {
+  const theme = useTheme()
+  const styles = useStyleSheet(themedStyles);
+  return {
+    options: {
+      headerShown: true,
+      // headerTransparent: true,
+      headerTitleAlign: 'center',
+      headerTintColor: theme['color-primary-default'],
+      headerTitleStyle: styles.headerTitleStyle,
+      headerStyle: styles.headerStyle,
+    }
+  }
+}
 
 const HomeNavigator = () => {
   const styles = useStyleSheet(themedStyles);
-  const commonHeaderOptions = {
-    headerShown: true,
-    headerTransparent: true,
-    headerTitleAlign: 'center',
-    headerTintColor: '#FFFFFF',
-    headerTitleStyle: styles.headerTextStyle,
-  }
+  const commonHeaderOptions = useHeaderOptions();
+
   const tabBarOptions = {
-    ...commonHeaderOptions,
+    ...commonHeaderOptions.options,
     tabBarLabelStyle: styles.tabBarText,
     tabBarStyle: styles.tabBarStyle,
     tabBarHideOnKeyboard: true,
@@ -37,11 +49,11 @@ const HomeNavigator = () => {
   }
   const HomeTabs = () =>
     <Tab.Navigator screenOptions={tabBarOptions}>
-      <Tab.Screen name='Should be Home' component={Login} options={homeOptions}/>
+      <Tab.Screen name='Should be Home' component={Home} options={homeOptions}/>
     </Tab.Navigator>
 
   return (
-    <Stack.Navigator screenOptions={commonHeaderOptions}>
+    <Stack.Navigator screenOptions={commonHeaderOptions.options}>
       <Stack.Screen name='Home Tabs' component={HomeTabs} options={{headerShown: false}}/>
     </Stack.Navigator>
   );
@@ -49,23 +61,20 @@ const HomeNavigator = () => {
 
 const AuthNavigator = () => {
   const styles = useStyleSheet(themedStyles);
+  const theme = useTheme()
+  const commonHeaderOptions = useHeaderOptions();
   return(
-  <Stack.Navigator screenOptions={{
-    headerShown: true,
-    headerTransparent: true,
-    headerTitleAlign: 'center',
-    headerTintColor: '#FFFFFF',
-    headerTitleStyle: styles.headerTextStyle,
-  }}>
-    <Stack.Screen name='Sign In' component={Login} options={{headerShown: false}}/>
+  <Stack.Navigator screenOptions={commonHeaderOptions.options}>
+    <Stack.Screen name='Sign In' component={Login} options={{headerShown: true}}/>
   </Stack.Navigator>
 );
 }
 
 export const AppNavigator = () => {
+  const auth = useSelector(selectAuth);
   return(
   <NavigationContainer>
-    {false ? <HomeNavigator/> : <AuthNavigator />}
+    {auth.uid ? <HomeNavigator/> : <AuthNavigator />}
   </NavigationContainer>
   );
 }
@@ -79,8 +88,11 @@ const themedStyles = StyleService.create({
     lineHeight: 16,
     letterSpacing: 0.6,
   },
-  headerTextStyle: {
-    color: '#FFFFFF',
+  headerStyle: {
+    backgroundColor: 'color-info-700',
+  },
+  headerTitleStyle: {
+    color: 'color-primary-default',
     fontSize: 32,
     fontFamily: 'Roboto_700Bold',
   },

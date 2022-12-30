@@ -52,7 +52,7 @@ function getUpdateRequired(currentBuildNumber){
     return compare(currentBuildNumber);
 }
 
-export default useVersion = (disablePull) => {
+export default (disablePull) => {
   const version = '0.0.0';  // TODO: read version from redux store
   const { addError } = useAPIError();
   const dispatch = useDispatch();
