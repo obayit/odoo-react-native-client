@@ -10,6 +10,7 @@ This is a managed expo project, run the following commands to start the developm
 ## Screenshots
 Login page
 <img alt="Login" src="docs/login.jpg" width="250"/>
+
 Home page
 <img alt="Home" src="docs/home.jpg" width="250"/>
 
