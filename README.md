@@ -12,8 +12,6 @@ This is a managed expo project, run the following commands to start the developm
 <img alt="Home" src="docs/home.jpg" width="250"/>
 
 
-### why react-native-svg is not in sync with expo version?
-
 ### Used libraries
 * State Management: redux (RTK Query)
 * Navigation: React Navigation
@@ -29,6 +27,8 @@ This is a managed expo project, run the following commands to start the developm
 * API: attachments
 * UI: UI Kitten custom mapping to match Odoo theme
 
+
+### Why react-native-svg is not in sync with expo version?
 because the expo version causes an error for ui kitten eva icons, see: https://github.com/akveo/react-native-ui-kitten/issues/1675
 
 If you see the error:
