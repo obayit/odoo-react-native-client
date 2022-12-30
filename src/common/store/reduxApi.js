@@ -40,26 +40,30 @@ const baseQueryWithInterceptor  = async (args, api, extraOptions) => {
   and to logout from the app in case of the session being ended (also clear all local data).
   */
   
-  console.debug('### we are in the beam of baseQueryWithInterceptor');
-  console.debug(args);
+  // console.debug('### we are in the beam of baseQueryWithInterceptor');
+  // console.debug(args);
   const response = await baseQuery(args, api, extraOptions)
-  console.debug(response);
+  // console.debug('response');
+  // console.debug(response);
   if(response.error){
     return response;
   }
   if(response.data){
+    // console.log('# we are in the beam of !!response.data')
     const responseStatus = isResponseOk(response.data);
     if(responseStatus.ok){
-      console.debug('### responseStatus is ok, will return data');
-      return {
-        // TODO: continue from here, what should this method return in case of success?
-        data: response.data.result.records
+      // console.debug('### responseStatus is ok, will return data');
+      const res = {
+        data: response.data.result,
       }
+      // console.debug('# res');
+      // console.debug(res);
+      return res;
     }else{
-      console.debug('### responseStatus is error');
+      // console.debug('### responseStatus is error');
       return {
         status: 'CUSTOM_ERROR',
-        data: responseStatus,
+        // data: responseStatus,
         error: responseStatus.message,
       }; // as FetchBaseQueryError;
     }
@@ -118,11 +122,13 @@ export const odooApi = createApi({
         },
       }),
       // Pick out data and prevent nested properties in a hook or selector
-      transformResponse: (response, meta, arg) => response.data,
+      // transformResponse: (response, meta, arg) => {
+      //   return response;
+      // },
     }),
   }),
 });
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
-export const { useGetPartners, useWritePartnerMutation, useLoginMutation } = odooApi
+export const { useGetPartnersQuery, useWritePartnerMutation, useLoginMutation } = odooApi

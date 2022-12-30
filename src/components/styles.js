@@ -5,5 +5,8 @@ export const ReusableStyles = StyleService.create({
   mainButton: {
     borderRadius: 24,
     margin: 16,
+  },
+  listContainer: {
+    padding: 16,
   }
 });

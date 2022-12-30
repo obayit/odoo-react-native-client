@@ -2,7 +2,7 @@ import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import { ImageBackground, Image, Keyboard, View, Pressable } from 'react-native';
 import { CheckBox, Button, Input, Layout, StyleService, Text, useStyleSheet, Icon } from '@ui-kitten/components';
 
-import { renderPasswordIcon, TextInput, Loading, LoginContainer, ReusableStyles  } from '../../components';
+import { renderPasswordIcon, TextInput, Loading, FeatureContainer, ReusableStyles  } from '../../components';
 
 import useAPIError from '../../common/hooks/useAPIError';
 import * as yup from "yup";
@@ -11,13 +11,17 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { getPassword, getUsername, savePassword, saveUsername } from '../../native-common/storage/secureStore';
 import * as LocalAuthentication from 'expo-local-authentication';
 import { useLoginMutation } from '../../common/store/reduxApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { selectAuth, setAuth } from '../../common/store/authSlice';
 
 export const PersonIcon = (style) => (
-  <Icon {...style} fill="#CFD6E2" name='person' />
+  <Icon {...style} name='person' />
 );
 
 export default ({ navigation }) => {
   const [loginMethod, loginResult] = useLoginMutation()
+  const auth = useSelector(selectAuth);
+  const dispatch = useDispatch();
   const rememberMe = useState(false);  // FIXME: move remember me into a reusable redux, and use it in the remember me component instead of passing it from every auth related page
 
   const [passwordVisible, setPasswordVisible] = React.useState(false);
@@ -44,8 +48,6 @@ export default ({ navigation }) => {
   const onSignInButtonPress = async (data) => {
     setPasswordVisible(false);
     setIsLoading(true);
-    console.log('data')
-    console.log(data)
     const password = data.password;
     let login = data.login;
     if(!login.includes('@') && login && login[0] === 's'){
@@ -53,7 +55,9 @@ export default ({ navigation }) => {
     }
     try{
       login = login.trim();
-      await loginMethod({login, password});
+      // NOTE: unwraps either returns the success response, or throws an error
+      let auth = await loginMethod({login, password}).unwrap();  // use .unwrap() here?
+      dispatch(setAuth({ ...auth }))
       const response = {};
       if(response){  // response is uid
           if(rememberMe){
@@ -108,29 +112,20 @@ export default ({ navigation }) => {
     required: true,
     style: [reusableStyles.formControl, reusableStyles.transparentFormControl],
     labelStyle: reusableStyles.transparentFormControlLabel,
+    autoCapitalize: 'none',
+    size: 'large',
+    textStyle: reusableStyles.transparentFormControlLabel,
   }
 
   return (
-    <LoginContainer>
+    <FeatureContainer>
       <View
         style={styles.formContainer}
         >
-        {/* <TestBanner/> */}
-        <Text
-          // category='h3'
-          textType='bold'
-          lightText={true}
-          style={styles.signInText}
-          status='control'>
-          Sign in
-        </Text>
         <FormProvider {...formMethods}>
           <TextInput name='login' label='Email' {...commonInputProps}
           inputProps={{
             accessoryRight: PersonIcon,
-            autoCapitalize: 'none',
-            size: 'large',
-            textStyle: reusableStyles.transparentFormControlLabel,
             onSubmitEditing: () => passwordInput.current.focus(),
             }}/>
             {/* NOTE: see this to implement auto login on pressing enter, https://stackoverflow.com/a/35765465/3557761 */}
@@ -138,29 +133,27 @@ export default ({ navigation }) => {
           inputProps={{
             ref: passwordInput,
             accessoryRight: disablePasswordVisible ? null : (props) => renderPasswordIcon({onPress: onPasswordIconPress, passwordVisible, ...props}),
-            autoCapitalize: 'none',
             secureTextEntry: disablePasswordVisible || !passwordVisible,
-            size: 'large',
-            textStyle: reusableStyles.transparentFormControlLabel,
             onSubmitEditing: handleSubmit(onSignInButtonPress),
             }}/>
           {isLoading && <Loading status='control'/>}
         </FormProvider>
-        <Button disabled={isLoading} onPress={handleSubmit(onSignInButtonPress)}>Login</Button>
+
+        <Button disabled={isLoading} onPress={handleSubmit(onSignInButtonPress)} style={styles.submitButton}>Login</Button>
       </View>
-    </LoginContainer>
+    </FeatureContainer>
   );
 };
 
 const themedStyles = StyleService.create({
   formContainer: {
     flex: 1,
-    paddingTop: 50,
+    paddingTop: 10,
     paddingHorizontal: 16,
-    backgroundColor: '#71639E',
+    backgroundColor: 'background-basic-color-1',
   },
   signInText: {
-    marginBottom: 44,
+    marginBottom: 20,
     fontSize: 30,
   },
   rememberMeBox: {
@@ -171,6 +164,9 @@ const themedStyles = StyleService.create({
   },
   forgotPassword: {
     marginTop: 0,
-  }
+  },
+  submitButton: {
+    marginTop: 10,
+  },
 });
 

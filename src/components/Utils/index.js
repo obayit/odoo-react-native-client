@@ -5,7 +5,7 @@ import { Icon, StyleService } from '@ui-kitten/components';
 export const renderPasswordIcon = ({onPress, passwordVisible, ...props}) => {
   return(
     <Pressable onPress={onPress}>
-      <Icon {...props} name={passwordVisible ? 'eye-off' : 'eye'} fill="#ffffff"/>
+      <Icon {...props} name={passwordVisible ? 'eye-off' : 'eye'}/>
     </Pressable>
   );
 }
