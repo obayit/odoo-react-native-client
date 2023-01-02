@@ -2,10 +2,7 @@
 This project is still in the early development stage, and major changes will be applied.
 
 ## How to run
-This is a managed expo project, run the following commands to start the development:
-
-`npm install`
-`npx expo start`
+This is a managed expo project, run the following commands to start the development: `npm install`, then`npx expo start`
 
 ## Screenshots
 <img alt="Login" src="docs/login.jpg" width="250"/>
@@ -16,6 +13,7 @@ This is a managed expo project, run the following commands to start the developm
 * State Management: redux (RTK Query)
 * Navigation: React Navigation
 * Form data: React Hook Form
+* Form validation: Yup
 
 ## Features
 * Centralized Error Handling: errors can be triggered using a callback method provided by APIErrorContext context.

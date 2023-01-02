@@ -9,7 +9,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Login from '../features/Login'
 import { useSelector } from 'react-redux';
 import { selectAuth } from '../common/store/authSlice';
-import Home from '../features/Home';
+import Products from '../features/Products';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -43,13 +43,13 @@ const HomeNavigator = () => {
     // https://oblador.github.io/react-native-vector-icons/
     <MaterialCommunityIcons name={name} color={color} size={size} />
   );
-  const homeOptions = {
-    title: 'Home',
-    tabBarIcon: (props) => tabBarIcon({name: 'home', ...props}),
+  const productsOptions = {
+    title: 'Products',
+    tabBarIcon: (props) => tabBarIcon({name: 'shopping', ...props}),
   }
   const HomeTabs = () =>
     <Tab.Navigator screenOptions={tabBarOptions}>
-      <Tab.Screen name='Should be Home' component={Home} options={homeOptions}/>
+      <Tab.Screen name='Our Products' component={Products} options={productsOptions}/>
     </Tab.Navigator>
 
   return (

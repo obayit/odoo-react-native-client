@@ -106,6 +106,7 @@ export default ({ navigation }) => {
 
   useEffect(() => {
     // setSavedLoginInfo();  // FIXME: activate this later
+    handleSubmit(onSignInButtonPress);
   }, []);
 
   const commonInputProps = {
@@ -136,7 +137,8 @@ export default ({ navigation }) => {
             secureTextEntry: disablePasswordVisible || !passwordVisible,
             onSubmitEditing: handleSubmit(onSignInButtonPress),
             }}/>
-          {isLoading && <Loading status='control'/>}
+          <Text>isLoading: {JSON.stringify(isLoading)}</Text>
+          <Loading status='control' isLoading={isLoading}/>
         </FormProvider>
 
         <Button disabled={isLoading} onPress={handleSubmit(onSignInButtonPress)} style={styles.submitButton}>Login</Button>
