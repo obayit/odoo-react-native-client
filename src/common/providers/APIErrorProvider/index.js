@@ -19,7 +19,7 @@ export default function APIErrorProvider({ children }) {
     setError(null);
   }
 
-  const addError = (message, options) => { 
+  const addError = (message, options) => {
     if(options && options.errorCode === INVALID_MOBILE_VERIFICATION){
       // mobile verification error doesn't need a modal
       return;
@@ -32,7 +32,7 @@ export default function APIErrorProvider({ children }) {
 
   const contextValue = {
     error,
-    addError: useCallback((message, options) => addError(message, options), []),
+    addError: useCallback((message, onavigationptions) => addError(message, options), []),
     removeError: useCallback(() => removeError(), [])
   };
 

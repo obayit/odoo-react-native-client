@@ -17,7 +17,7 @@ export default function Loading({text, status='primary', style, isLoading}) {
       }
     </View>
   );
-};
+}
 
 const themedStyles = StyleService.create({
   spinnerContainer: {

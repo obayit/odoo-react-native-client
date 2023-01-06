@@ -14,12 +14,12 @@ export default function YesNoModal({ showModal, setShowModal, parentOnYes, paren
     setConfirmChecked(false);
     parentOnYes();
     setShowModal(false);
-  };
+  }
   function onNo(){
     setConfirmChecked(false);
     parentOnNo && parentOnNo();
     setShowModal(false);
-  };
+  }
 
   let icon = require('../../../assets/images/icons/info.png');
   if(type === 'success'){
@@ -77,7 +77,7 @@ export default function YesNoModal({ showModal, setShowModal, parentOnYes, paren
         </View>
     </Modal>
   );
-};
+}
 
 const themedStyles = StyleService.create({
   backdrop: {

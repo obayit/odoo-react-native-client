@@ -9,4 +9,4 @@ export function FeatureContainer ({children}) {
       {children}
     </SafeAreaLayout>
   );
-};
+}

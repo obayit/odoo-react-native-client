@@ -31,7 +31,7 @@ function composeParams(model, options = {}) {
 
 // *****************************************************
 
-const baseQuery = fetchBaseQuery({ baseUrl: `http://192.168.86.179:8015` })  // TODO: read this from a configurable source!
+const baseQuery = fetchBaseQuery({ baseUrl: `http://192.168.113.179:8015` })  // TODO: read this from a configurable source!
 
 const baseQueryWithInterceptor = async (args, api, extraOptions) => {
     /* this method is created only to capture odoo specific errors.
@@ -150,6 +150,28 @@ export const odooApi = createApi({
         }),
     }),
 });
+
+const capitalize = (str) => str[0].toUpperCase() + str.slice(1);
+
+export const injectQuery = (model, options) => {
+    let defaultOptions = {
+        fields: ['id', 'name'],
+    }
+    options = { ...defaultOptions, ...(options || {}) }
+    const { fields } = options;
+
+    let queryName = '';
+    model.split('.').map(part => queryName += capitalize(part));
+    const api = odooApi.injectEndpoints({
+        endpoints: (builder) => ({
+            [queryName]: builder.query(getCommonSearchQuery(model, { fields })),
+        }),
+        overrideExisting: true,  // TODO: put correct value for thisk
+    });
+    return {
+        useQuery: api.endpoints[queryName].useQuery,
+    }
+}
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints

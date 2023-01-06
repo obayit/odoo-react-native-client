@@ -7,7 +7,7 @@ This is a managed expo project, run the following commands to start the developm
 ## Screenshots
 <img alt="Login" src="docs/login.jpg" width="250"/>
 <img alt="Home" src="docs/home.jpg" width="250"/>
-
+<img alt="Dynamic List" src="docs/dynamic_list.jpg" width="250"/>
 
 ### Used libraries
 * State Management: redux (RTK Query)
@@ -17,6 +17,7 @@ This is a managed expo project, run the following commands to start the developm
 
 ## Features
 * Centralized Error Handling: errors can be triggered using a callback method provided by APIErrorContext context.
+* Can add odoo models data dynamically (e.g: add a `search_read` endpoint for `res.currency`). This is achived with RTK Query's `injectEndpoints`.
 
 ### Milestones:
 * Field builder: build the _react-hook-form_ form using an object describing the field properties.
