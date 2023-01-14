@@ -34,32 +34,36 @@ export const fLCapital = s => {
     return s ? s.replace(/./, c => c.toUpperCase()) : ''
 }
 
-export const useYupValidationResolver = validationSchema =>
-React.useCallback(async data => {
-    try {
-    const values = await validationSchema.validate(data, {
-        abortEarly: false
-    });
+// sauce: https://stackoverflow.com/a/9436948/3557761
+export const isString = input => (typeof input === 'string' || input instanceof String)
 
-    return {
-        values,
-        errors: {}
-    };
-    } catch (errors) {
-    return {
-        values: {},
-        errors: errors.inner.reduce(
-        (allErrors, currentError) => ({
-            ...allErrors,
-            [currentError.path]: {
-            type: currentError.type ?? "validation",
-            message: currentError.message
-            }
-        }),
-        {}
-        )
-    };
-    }
-},
-[validationSchema]
-);
+export const useYupValidationResolver = validationSchema =>
+    React.useCallback(async data => {
+        try {
+            const values = await validationSchema.validate(data, {
+                abortEarly: false
+            });
+
+            return {
+                values,
+                errors: {}
+            };
+        } catch (errors) {
+            return {
+                values: {},
+                errors: errors.inner.reduce(
+                (allErrors, currentError) => ({
+                    ...allErrors,
+                    [currentError.path]: {
+                    type: currentError.type ?? "validation",
+                    message: currentError.message
+                    }
+                }),
+                {}
+                )
+            };
+        }
+    },
+    [validationSchema]
+    );
+

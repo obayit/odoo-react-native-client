@@ -2,7 +2,7 @@ import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import { View, ScrollView } from 'react-native';
 import { List, ListItem, Text, StyleService, useStyleSheet, Icon, Button } from '@ui-kitten/components';
 
-import { ReusableStyles, FeatureContainer, Loading } from '../../components';
+import { TextInput, ReusableStyles, FeatureContainer, Loading } from '../../components';
 
 import useAPIError from '../../common/hooks/useAPIError';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,35 +10,17 @@ import { logOut, selectAuth, setAuth } from '../../common/store/authSlice';
 import { useProductsQuery } from '../../common/store/reduxApi';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { displayM2O } from '../../common/utils/parseData';
-import { useNavigation } from '@react-navigation/native'
+import { FormProvider } from 'react-hook-form';
+import useForm from '../../common/hooks/useForm';
 
 export const PersonIcon = (style) => (
     <Icon {...style} name='person' />
 );
 
 
-const PartnerItem = ({ item: product, navigation }) => {
-    const addProductToCart = () => {
-        // use the updateCart mutation here :)
-        console.log(`#Adding "${product?.name}" to cart`);
-    }
-    const ProductRightAccessory = () => {
-        return (
-            <MaterialCommunityIcons name='cart-plus' color='black' size={24} onPress={addProductToCart} />
-        );
-    }
-    const navigateToProductEdit = () => {
-        navigation.navigate('Edit Product', {record: product});
-    }
-    return (
-        <ListItem title={`${product?.name}: ${product?.list_price} ${displayM2O(product?.currency_id)}`} accessoryRight={ProductRightAccessory} onPress={navigateToProductEdit}/>
-    );
-}
-
-
-export default ({ navigation }) => {
+export default ({ navigation, route }) => {
     const dispatch = useDispatch();
-
+    const { record } = route.params;
     const { data, isLoading } = useProductsQuery();
 
     const styles = useStyleSheet(themedStyles);
@@ -50,18 +32,35 @@ export default ({ navigation }) => {
         // setSavedLoginInfo();  // FIXME: activate this later
     }, []);
 
+    const fieldName = {
+        name: 'name',
+        label: 'Name',
+        required: true,
+        type: 'char',
+    };
+    const fieldBarcode = {
+        name: 'barcode',
+        label: 'Barcode',
+        required: false,
+        type: 'char',
+    };
+    let fields = [
+        fieldName,
+        fieldBarcode,
+    ]
+
+    const { formMethods } = useForm(fields, {record});
+
     return (
         <FeatureContainer>
             <View style={rs.listContainer}>
-                <Loading isLoading={isLoading} />
+                <FormProvider {...formMethods}>
+                    <TextInput field={fieldName} />
+                    <TextInput field={fieldBarcode} />
 
-                <List
-                    style={styles.container}
-                    data={data?.records}
-                    renderItem={props => <PartnerItem {...props} navigation={navigation}/>}
-                />
-                <Button onPress={onLogout}>Logout</Button>
+                    <Button onPress={onLogout}>Logout</Button>
 
+                </FormProvider>
             </View>
         </FeatureContainer>
     );

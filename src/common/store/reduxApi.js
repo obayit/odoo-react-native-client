@@ -31,7 +31,7 @@ function composeParams(model, options = {}) {
 
 // *****************************************************
 
-const baseQuery = fetchBaseQuery({ baseUrl: `http://192.168.113.179:8015` })  // TODO: read this from a configurable source!
+const baseQuery = fetchBaseQuery({ baseUrl: `http://192.168.103.179:8015` })  // TODO: read this from a configurable source!
 
 const baseQueryWithInterceptor = async (args, api, extraOptions) => {
     /* this method is created only to capture odoo specific errors.
