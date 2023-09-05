@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
-import authReducer from './authSlice'
+import authReducer, { configurationReducer } from './authSlice'
 import { odooApi } from './reduxApi'
 import { persistReducer, persistStore } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -12,17 +12,19 @@ const persistConfig = {
 }
 
 const persistedAuthReducer = persistReducer(persistConfig, authReducer)
+const persistedConfigurationReducer = persistReducer(persistConfig, configurationReducer)
 
 export const store = configureStore({
-reducer: {
-  // Add the generated reducer as a specific top-level slice
-  [odooApi.reducerPath]: odooApi.reducer,
-  auth: persistedAuthReducer,
+  reducer: {
+    // Add the generated reducer as a specific top-level slice
+    [odooApi.reducerPath]: odooApi.reducer,
+    auth: persistedAuthReducer,
+    configuration: persistedConfigurationReducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,
   // and other useful features of `rtk-query`.
   middleware: (getDefaultMiddleware) =>
-  getDefaultMiddleware().concat(odooApi.middleware),
+    getDefaultMiddleware().concat(odooApi.middleware),
 
   devTools: process.env.NODE_ENV !== 'production',
 })

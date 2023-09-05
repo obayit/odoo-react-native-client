@@ -8,5 +8,6 @@ export const ReusableStyles = StyleService.create({
   },
   listContainer: {
     padding: 16,
+    backgroundColor: 'white',
   }
 });

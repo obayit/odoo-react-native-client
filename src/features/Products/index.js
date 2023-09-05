@@ -7,7 +7,7 @@ import { ReusableStyles, FeatureContainer, Loading } from '../../components';
 import useAPIError from '../../common/hooks/useAPIError';
 import { useDispatch, useSelector } from 'react-redux';
 import { logOut, selectAuth, setAuth } from '../../common/store/authSlice';
-import { useProductsQuery } from '../../common/store/reduxApi';
+import { useProductsQuery, useUpdateCartMutation } from '../../common/store/reduxApi';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { displayM2O } from '../../common/utils/parseData';
 import { useNavigation } from '@react-navigation/native'
@@ -17,10 +17,12 @@ export const PersonIcon = (style) => (
 );
 
 
-const PartnerItem = ({ item: product, navigation }) => {
+const ProductItem = ({ item: product, navigation }) => {
+    const [updateCart, updateCartResult] = useUpdateCartMutation()
+    const styles = useStyleSheet(themedStyles)
     const addProductToCart = () => {
         // use the updateCart mutation here :)
-        console.log(`#Adding "${product?.name}" to cart`);
+        updateCart({product_id: product.id});
     }
     const ProductRightAccessory = () => {
         return (
@@ -31,7 +33,7 @@ const PartnerItem = ({ item: product, navigation }) => {
         navigation.navigate('Edit Product', {record: product});
     }
     return (
-        <ListItem title={`${product?.name}: ${product?.list_price} ${displayM2O(product?.currency_id)}`} accessoryRight={ProductRightAccessory} onPress={navigateToProductEdit}/>
+        <ListItem title={`${product?.name}: ${product?.list_price} ${displayM2O(product?.currency_id)} :: ${updateCartResult}`} accessoryRight={ProductRightAccessory} onPress={navigateToProductEdit} style={styles.listItem}/>
     );
 }
 
@@ -52,15 +54,15 @@ export default ({ navigation }) => {
 
     return (
         <FeatureContainer>
-            <View style={rs.listContainer}>
+            <View style={styles.listContainer}>
                 <Loading isLoading={isLoading} />
 
                 <List
-                    style={styles.container}
+                    style={styles.list}
                     data={data?.records}
-                    renderItem={props => <PartnerItem {...props} navigation={navigation}/>}
+                    renderItem={props => <ProductItem {...props} navigation={navigation}/>}
                 />
-                <Button onPress={onLogout}>Logout</Button>
+                <Button onPress={onLogout} style={styles.submitButton}>Logout</Button>
 
             </View>
         </FeatureContainer>
@@ -68,4 +70,23 @@ export default ({ navigation }) => {
 };
 
 const themedStyles = StyleService.create({
+    listContainer: {
+        flex: 1,
+        justifyContent: 'flex-start',
+
+        backgroundColor: 'white',
+    },
+    list: {
+        backgroundColor: 'white',
+    },
+    listItem: {
+        borderWidth: 2,
+        borderColor: 'lightgrey',
+        borderRadius: 15,
+        margin: 5,
+    },
+    submitButton: {
+        borderRadius: 15,
+        margin: 5,
+    }
 });
