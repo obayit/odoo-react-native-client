@@ -47,7 +47,7 @@ export default ({ navigation }) => {
   const { handleSubmit, setValue } = formMethods;
 
   const styles = useStyleSheet(themedStyles);
-  const reusableStyles = useStyleSheet(ReusableStyles);
+  const rs = useStyleSheet(ReusableStyles);
   const { addError } = useAPIError();
 
   const onSignInButtonPress = async (data) => {
@@ -116,11 +116,11 @@ export default ({ navigation }) => {
 
   const commonInputProps = {
     required: true,
-    style: [reusableStyles.formControl, reusableStyles.transparentFormControl],
-    labelStyle: reusableStyles.transparentFormControlLabel,
+    style: [rs.formControl, rs.transparentFormControl],
+    labelStyle: rs.transparentFormControlLabel,
     autoCapitalize: 'none',
     size: 'large',
-    textStyle: reusableStyles.transparentFormControlLabel,
+    textStyle: rs.transparentFormControlLabel,
   }
 
   const updateUrl = (value) => {
@@ -133,14 +133,14 @@ export default ({ navigation }) => {
       'database': value,
     }))
   }
+  
 
   return (
     <FeatureContainer loading={isLoading}>
       <View
-        style={styles.formContainer}
+        style={rs.formContainer}
       >
         <FormProvider {...formMethods}>
-          <Text>{JSON.stringify(configuration)}</Text>
           <TextInput name='base_url' label='URL' {...commonInputProps}
             onChangeCallBack={updateUrl}
             inputProps={{
@@ -176,14 +176,6 @@ export default ({ navigation }) => {
 };
 
 const themedStyles = StyleService.create({
-  formContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: 10,
-    paddingHorizontal: 16,
-    backgroundColor: 'background-basic-color-1',
-  },
   signInText: {
     marginBottom: 20,
     fontSize: 30,

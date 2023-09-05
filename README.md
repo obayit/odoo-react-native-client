@@ -21,7 +21,7 @@ This is a managed expo project, run the following commands to start the developm
 
 ### Milestones:
 * Field builder: build the _react-hook-form_ form using an object describing the field properties.
-* API: search_read, read
+* API: search_read (with paging), read
 * API: create, write, unlink
 * API: attachments
 * UI: UI Kitten custom mapping to match Odoo theme

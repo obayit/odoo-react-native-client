@@ -17,9 +17,10 @@ export const PersonIcon = (style) => (
 );
 
 
-const ProductItem = ({ item: product, navigation }) => {
+const ProductItem = ({ item: product }) => {
+    const navigation = useNavigation()
     const [updateCart, updateCartResult] = useUpdateCartMutation()
-    const styles = useStyleSheet(themedStyles)
+    const styles = useStyleSheet(ReusableStyles)
     const addProductToCart = () => {
         // use the updateCart mutation here :)
         updateCart({product_id: product.id});
@@ -33,7 +34,7 @@ const ProductItem = ({ item: product, navigation }) => {
         navigation.navigate('Edit Product', {record: product});
     }
     return (
-        <ListItem title={`${product?.name}: ${product?.list_price} ${displayM2O(product?.currency_id)} :: ${updateCartResult}`} accessoryRight={ProductRightAccessory} onPress={navigateToProductEdit} style={styles.listItem}/>
+        <ListItem title={`${product?.name}: ${product?.list_price} ${displayM2O(product?.currency_id)}`} accessoryRight={ProductRightAccessory} onPress={navigateToProductEdit} style={styles.listItem}/>
     );
 }
 
@@ -43,8 +44,7 @@ export default ({ navigation }) => {
 
     const { data, isLoading } = useProductsQuery();
 
-    const styles = useStyleSheet(themedStyles);
-    const rs = useStyleSheet(ReusableStyles);
+    const styles = useStyleSheet(ReusableStyles);
 
     const onLogout = () => dispatch(logOut());
 
@@ -60,7 +60,7 @@ export default ({ navigation }) => {
                 <List
                     style={styles.list}
                     data={data?.records}
-                    renderItem={props => <ProductItem {...props} navigation={navigation}/>}
+                    renderItem={props => <ProductItem {...props}/>}
                 />
                 <Button onPress={onLogout} style={styles.submitButton}>Logout</Button>
 
@@ -70,23 +70,4 @@ export default ({ navigation }) => {
 };
 
 const themedStyles = StyleService.create({
-    listContainer: {
-        flex: 1,
-        justifyContent: 'flex-start',
-
-        backgroundColor: 'white',
-    },
-    list: {
-        backgroundColor: 'white',
-    },
-    listItem: {
-        borderWidth: 2,
-        borderColor: 'lightgrey',
-        borderRadius: 15,
-        margin: 5,
-    },
-    submitButton: {
-        borderRadius: 15,
-        margin: 5,
-    }
 });

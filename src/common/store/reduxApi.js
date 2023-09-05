@@ -164,8 +164,8 @@ export const injectQuery = (model, options) => {
   options = { ...defaultOptions, ...(options || {}) }
   const { fields } = options;
 
-  let queryName = '';
-  model.split('.').map(part => queryName += capitalize(part));
+  let queryName = model;  // ''
+  // model.split('.').map(part => queryName += capitalize(part));
   const api = odooApi.injectEndpoints({
     endpoints: (builder) => ({
       [queryName]: builder.query(getCommonSearchQuery(model, { fields })),

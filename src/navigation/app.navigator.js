@@ -12,6 +12,7 @@ import { selectAuth } from '../common/store/authSlice';
 import Products from '../features/Products';
 import DynamicList from '../features/DynamicList';
 import EditProduct from '../features/EditProduct/';
+import SelectModel from '../features/SelectModel';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -49,6 +50,10 @@ const HomeNavigator = () => {
     title: 'Products',
     tabBarIcon: (props) => tabBarIcon({name: 'shopping', ...props}),
   }
+  const selectModelOptions = {
+    title: 'Select a Model',
+    tabBarIcon: (props) => tabBarIcon({name: 'file-search', ...props}),
+  }
   const dynamicOptions = {
     title: 'Dynamic List',
     tabBarIcon: (props) => tabBarIcon({name: 'star', ...props}),
@@ -56,12 +61,13 @@ const HomeNavigator = () => {
   const HomeTabs = () =>
     <Tab.Navigator screenOptions={tabBarOptions}>
       <Tab.Screen name='Our Products' component={Products} options={productsOptions}/>
-      <Tab.Screen name='Dynamic List' component={DynamicList} options={dynamicOptions}/>
+      <Tab.Screen name='Select Model' component={SelectModel} options={selectModelOptions}/>
     </Tab.Navigator>
 
   return (
     <Stack.Navigator screenOptions={commonHeaderOptions.options}>
       <Stack.Screen name='Home Tabs' component={HomeTabs} options={{headerShown: false}}/>
+      <Tab.Screen name='Dynamic List' component={DynamicList} options={dynamicOptions}/>
       <Tab.Screen name='Edit Product' component={EditProduct}/>
     </Stack.Navigator>
   );

@@ -10,9 +10,15 @@ const persistConfig = {
   blacklist: [odooApi.reducerPath],
   storage: AsyncStorage,
 }
+const configPersistConfig = {
+  // yes we have to create a separate configuration object for each persistReducer call
+  key: 'root',
+  blacklist: [odooApi.reducerPath],
+  storage: AsyncStorage,
+}
 
 const persistedAuthReducer = persistReducer(persistConfig, authReducer)
-const persistedConfigurationReducer = persistReducer(persistConfig, configurationReducer)
+const persistedConfigurationReducer = persistReducer(configPersistConfig, configurationReducer)
 
 export const store = configureStore({
   reducer: {
