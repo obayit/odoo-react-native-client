@@ -30,6 +30,14 @@ export function displayDate(datetime){
     return formattedDate;
 }
 
+export function displayM2o(value) {
+  if (value && value.length === 2) {
+    return value[1]
+  } else {
+    return null
+  }
+}
+
 export const fLCapital = s => {
     return s ? s.replace(/./, c => c.toUpperCase()) : ''
 }

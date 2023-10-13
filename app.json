@@ -12,7 +12,8 @@
       "backgroundColor": "#ffffff"
     },
     "updates": {
-      "fallbackToCacheTimeout": 0
+      "fallbackToCacheTimeout": 0,
+      "url": "https://u.expo.dev/4aad29af-77cc-4c0a-87d7-330e2bd78508"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -29,10 +30,20 @@
     "web": {
       "favicon": "./assets/favicon.png",
       "build": {
-        "babel":{
-          "include": [ "@ui-kitten/components" ]
+        "babel": {
+          "include": [
+            "@ui-kitten/components"
+          ]
         }
       }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4aad29af-77cc-4c0a-87d7-330e2bd78508"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
     }
   }
 }

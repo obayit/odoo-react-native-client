@@ -3,9 +3,11 @@ import useAPIError from '../../common/hooks/useAPIError';
 import { useStyleSheet, StyleService } from '@ui-kitten/components';
 import { actions } from '../../common/providers/APIErrorProvider';
 import { useNavigation } from '@react-navigation/native';
-import { View, Platform, Linking } from 'react-native'
+import { View, Platform, Linking, Alert } from 'react-native'
 import * as Application from 'expo-application';
-import YesNoModal from '../YesNoModal';
+import AppModal from '../AppModal';
+import { clearErrors, flagShown, selectErrors } from '../../common/store/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 
 export function getStoreLink(){
@@ -46,18 +48,16 @@ export function openContactEmail(email){
 
 
 export default function ErrorModal() {
-  const { error, removeError } = useAPIError();
-  const navigation = useNavigation(); 
-
-  if(error && error.action === actions.sessionInvalid){
-    // dispatch(updateLoginInfoAction(null));  // TODO: trigger logout redux action here
-  }
+  const errors = useSelector(selectErrors)
+  const error = errors?.length ? errors[errors.length - 1] : false
+  const navigation = useNavigation();
+  const dispatch = useDispatch()
 
   let type = 'error';
   let header = 'Error';
 
   let options = {};
-  if(error && error.options){
+  if(error?.options){
     options = error.options;
   }
 
@@ -73,16 +73,26 @@ export default function ErrorModal() {
     }
   }
 
+  const removeError = () => {
+    // NOTE: should we remove all errors
+    dispatch(clearErrors())
+  }
+
   const profile = {}; // TODO: use user profile here
 
   useEffect(() => {
+    // TODO: Move this to its own component
     if(profile.force_reset_password === true){
       navigation.navigate('Change Password');
     }
   }, [profile]);
 
+  const onCancel = () => {
+    removeError()
+  }
+
   const onOk = () => {
-    if(error && error.action === actions.updateRequired){
+    if(error?.action === actions.updateRequired){
       openStoreLink();
     }else{
       removeError()
@@ -91,13 +101,14 @@ export default function ErrorModal() {
       navigation.navigate(options.navigateTo, options.navigationOptions);
     }
   }
+
   let buttonText = 'OK';
   if(error && error.action === actions.updateRequired){
     buttonText = 'Upgrade';
   }
 
   return (
-    <YesNoModal showModal={error} setShowModal={onOk} type={type}
+    <AppModal showModal={error} setShowModal={onOk} type={type}
     header={header} body={(error && error.message) ? error.message : ''} yesLabel={buttonText}
     onDone={onOk}
     />

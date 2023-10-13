@@ -19,7 +19,8 @@ export const PersonIcon = (style) => (
 );
 
 export default ({ navigation }) => {
-  const [loginMethod, loginResult] = useLoginMutation()
+  console.log('#Render :: Login')
+  const [loginMethod] = useLoginMutation()
   const auth = useSelector(selectAuth);
   const dispatch = useDispatch();
   const rememberMe = useState(false);  // FIXME: move remember me into a reusable redux, and use it in the remember me component instead of passing it from every auth related page
@@ -30,7 +31,7 @@ export default ({ navigation }) => {
   const passwordInput = useRef(null);
 
   const yupSchema = yup.object().shape({
-    base_url: yup.string().label('URL').required('Please enter URL'),
+    base_url: yup.string().label('URL'),
     database: yup.string().label('Database').required('Please Database name'),
     login: yup.string().label('Login').required('Please enter your login'),
     password: yup.string().label('Password').required('Please enter your password')
@@ -133,7 +134,9 @@ export default ({ navigation }) => {
       'database': value,
     }))
   }
-  
+
+  const testAddError = () => addError({message: 'test error'})
+
 
   return (
     <FeatureContainer loading={isLoading}>
@@ -160,7 +163,7 @@ export default ({ navigation }) => {
               onSubmitEditing: () => passwordInput.current.focus(),
             }} />
           {/* NOTE: see this to implement auto login on pressing enter, https://stackoverflow.com/a/35765465/3557761 */}
-          <TextInput name='password' label='Passwordo' {...commonInputProps}
+          <TextInput name='password' label='Password' {...commonInputProps}
             inputProps={{
               ref: passwordInput,
               accessoryRight: disablePasswordVisible ? null : (props) => renderPasswordIcon({ onPress: onPasswordIconPress, passwordVisible, ...props }),
@@ -170,6 +173,7 @@ export default ({ navigation }) => {
         </FormProvider>
 
         <Button disabled={isLoading} onPress={handleSubmit(onSignInButtonPress)} style={styles.submitButton}>Login</Button>
+        <Button status='control' onPress={testAddError} style={styles.submitButton}>Test Error Modal</Button>
       </View>
     </FeatureContainer>
   );

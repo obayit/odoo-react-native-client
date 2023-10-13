@@ -2,6 +2,7 @@ import React from 'react';
 import { Input } from '@ui-kitten/components';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useLabelStyle } from '../../hooks/useLabelStyle';
+import { InputWrapper } from '../InputWrapper';
 
 export default function TextInputInner({ name, style, label, inputProps, onChangeCallBack, onBlurCallBack, labelStyle, field }) {
     label = required ? label + ' *' : label;
@@ -14,25 +15,27 @@ export default function TextInputInner({ name, style, label, inputProps, onChang
     }
     return (
         <ConnectForm>
-            {({ control }) =>
+            {({ control, errors }) =>
                 <Controller
                     name={name}
                     control={control}
                     render={({ field: { onChange, onBlur, value } }) => (
-                        <Input
-                            label={label}
-                            value={value}
-                            style={style}
-                            onChangeText={value => {
-                                onChange(value);
-                                onChangeCallBack && onChangeCallBack(value)
-                            }}
-                            onBlur={e => {
-                                onBlur();
-                                onBlurCallBack && onBlurCallBack(value)
-                            }}
-                            {...inputProps}
-                        />
+                        <InputWrapper name={name} childStyle={style} errors={errors}>
+                            <Input
+                                label={label}
+                                value={value}
+                                style={style}
+                                onChangeText={value => {
+                                    onChange(value);
+                                    onChangeCallBack && onChangeCallBack(value)
+                                }}
+                                onBlur={e => {
+                                    onBlur();
+                                    onBlurCallBack && onBlurCallBack(value)
+                                }}
+                                {...inputProps}
+                            />
+                        </InputWrapper>
                     )}
                 />
             }

@@ -3,9 +3,7 @@ import { CheckBox, Card, Modal, Spinner, Input, Button, Text, Layout, useStyleSh
 import { Image, View } from 'react-native';
 import { ReusableStyles } from '../styles';
 
-
-// TODO: use the native Alert instead of a custom component, see showAlert() below
-export default function YesNoModal({ showModal, setShowModal, parentOnYes, parentOnNo, header, body, confirmLabel, yesLabel, dangerText, type, onDone, style, hideOnBackdropPress }) {
+export default ({ showModal, setShowModal, parentOnYes, parentOnNo, header, body, confirmLabel, yesLabel, dangerText, type, onDone, style, hideOnBackdropPress }) => {
   const styles = useStyleSheet(themedStyles);
   const reusableStyles = useStyleSheet(ReusableStyles);
   const [confirmChecked, setConfirmChecked] = useState(false);
@@ -35,27 +33,6 @@ export default function YesNoModal({ showModal, setShowModal, parentOnYes, paren
       setShowModal(false);
     }
   }
-
-  const showAlert = () =>
-  // TODO: use this method to show the Alert instead of using the UI Kitten modal
-    Alert.alert(
-      header,
-      body,
-      [
-        {
-          text: "Ok",
-          onPress: () => Alert.alert("Ok Pressed"),
-          style: "default",
-        },
-      ],
-      {
-        cancelable: true,
-        onDismiss: () =>
-          Alert.alert(
-            "This alert was dismissed by tapping outside of the alert dialog."
-          ),
-      }
-    );
 
   return (
     <Modal style={[styles.container, style]} backdropStyle={styles.backdrop} visible={showModal} onBackdropPress={onBackdropPress}>
@@ -89,6 +66,8 @@ const themedStyles = StyleService.create({
     justifyContent: 'center',
     alignItems: 'center',
 
+    borderWidth: 0.5,
+    borderColor: 'color-primary-600',
     borderRadius: 12,
     backgroundColor: '#FFFFFF',
     width: '90%',

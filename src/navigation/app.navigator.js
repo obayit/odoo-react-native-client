@@ -13,6 +13,7 @@ import Products from '../features/Products';
 import DynamicList from '../features/DynamicList';
 import EditProduct from '../features/EditProduct/';
 import SelectModel from '../features/SelectModel';
+import OrdersList from '../features/OrdersList';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -33,6 +34,7 @@ const useHeaderOptions = () => {
 }
 
 const HomeNavigator = () => {
+  console.log('#Render :: HomeNavigator')
   const styles = useStyleSheet(themedStyles);
   const commonHeaderOptions = useHeaderOptions();
 
@@ -58,8 +60,12 @@ const HomeNavigator = () => {
     title: 'Dynamic List',
     tabBarIcon: (props) => tabBarIcon({name: 'star', ...props}),
   }
+  const ordersOptions = {
+    tabBarIcon: (props) => tabBarIcon({name: 'star', ...props}),
+  }
   const HomeTabs = () =>
     <Tab.Navigator screenOptions={tabBarOptions}>
+      <Tab.Screen name='My Orders' component={OrdersList} options={ordersOptions}/>
       <Tab.Screen name='Our Products' component={Products} options={productsOptions}/>
       <Tab.Screen name='Select Model' component={SelectModel} options={selectModelOptions}/>
     </Tab.Navigator>
@@ -67,13 +73,14 @@ const HomeNavigator = () => {
   return (
     <Stack.Navigator screenOptions={commonHeaderOptions.options}>
       <Stack.Screen name='Home Tabs' component={HomeTabs} options={{headerShown: false}}/>
-      <Tab.Screen name='Dynamic List' component={DynamicList} options={dynamicOptions}/>
-      <Tab.Screen name='Edit Product' component={EditProduct}/>
+      <Stack.Screen name='Dynamic List' component={DynamicList} options={dynamicOptions}/>
+      <Stack.Screen name='Edit Product' component={EditProduct}/>
     </Stack.Navigator>
   );
 }
 
 const AuthNavigator = () => {
+  console.log('#Render :: AuthNavigator')
   const styles = useStyleSheet(themedStyles);
   const theme = useTheme()
   const commonHeaderOptions = useHeaderOptions();

@@ -1,6 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import { setupListeners } from '@reduxjs/toolkit/query'
-import authReducer, { configurationReducer } from './authSlice'
+import authReducer, { configurationReducer, errorsReducer } from './authSlice'
 import { odooApi } from './reduxApi'
 import { persistReducer, persistStore } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -25,6 +25,7 @@ export const store = configureStore({
     // Add the generated reducer as a specific top-level slice
     [odooApi.reducerPath]: odooApi.reducer,
     auth: persistedAuthReducer,
+    errors: errorsReducer,
     configuration: persistedConfigurationReducer,
   },
   // Adding the api middleware enables caching, invalidation, polling,

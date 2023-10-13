@@ -33,7 +33,7 @@ function composeParams(model, options = {}) {
 
 const baseQuery = async (args, api, extraOptions) => {
   const rawBaseQuery = fetchBaseQuery({
-    baseUrl: api.getState().configuration?.baseUrl || `http://192.168.112.179:8015`,
+    baseUrl: api.getState().configuration?.baseUrl,
   })
   return rawBaseQuery(args, api, extraOptions)
 }
@@ -65,7 +65,9 @@ const baseQueryWithInterceptor = async (args, api, extraOptions) => {
     } else {
       // console.debug('### responseStatus is error');
       return {
-        status: 'CUSTOM_ERROR',
+        meta: {
+          status: 'CUSTOM_ERROR',
+        },
         // data: responseStatus,
         error: responseStatus.message,
       }; // as FetchBaseQueryError;
@@ -162,13 +164,14 @@ export const injectQuery = (model, options) => {
     fields: ['id', 'name'],
   }
   options = { ...defaultOptions, ...(options || {}) }
-  const { fields } = options;
-
-  let queryName = model;  // ''
+  let queryName = model
+  if(options?.reduxNameSuffix){
+    queryName += options.reduxNameSuffix
+  }
   // model.split('.').map(part => queryName += capitalize(part));
   const api = odooApi.injectEndpoints({
     endpoints: (builder) => ({
-      [queryName]: builder.query(getCommonSearchQuery(model, { fields })),
+      [queryName]: builder.query(getCommonSearchQuery(model, options)),
     }),
     overrideExisting: true,  // TODO: put correct value for thisk
   });
