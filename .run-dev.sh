@@ -1,3 +1,3 @@
 #!/bin/bash
 set -ex
-npx expo start --offline $@
+npx expo start $@

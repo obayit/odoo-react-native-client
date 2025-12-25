@@ -1,6 +1,5 @@
 // maybe put all app icons here?
 import React from 'react';
-import { Icon } from '@ui-kitten/components';
 import Svg, { Text as SvgText } from 'react-native-svg';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 

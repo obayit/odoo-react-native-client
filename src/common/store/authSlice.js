@@ -2,15 +2,18 @@ import { createSlice } from "@reduxjs/toolkit"
 import { Platform } from "react-native"
 
 const initialState = { uid: null }
+const defaultDb = 'v16pos'
+const defaultUrl = 'http://192.168.1.101:8016'
+
 const initialConfigurationState = {
-  baseUrl: 'http://192.168.140.179:8015',
-  database: 'v15react',
+  baseUrl: process.env.REACT_APP_ODOO_URL ?? defaultUrl,
+  database:  process.env.REACT_APP_ODOO_DB ?? defaultDb,
 }
 const initialErrorsState = []
 
 const initialConfigurationStateWeb = {
   baseUrl: '',
-  database: 'v15react',
+  database: process.env.REACT_APP_ODOO_DB ?? defaultDb,
 }
 
 const authSlice = createSlice({

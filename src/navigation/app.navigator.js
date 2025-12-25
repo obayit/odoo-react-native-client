@@ -14,6 +14,7 @@ import DynamicList from '../features/DynamicList';
 import EditProduct from '../features/EditProduct/';
 import SelectModel from '../features/SelectModel';
 import OrdersList from '../features/OrdersList';
+import HomeScreen from '../features/HomeScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -63,8 +64,12 @@ const HomeNavigator = () => {
   const ordersOptions = {
     tabBarIcon: (props) => tabBarIcon({name: 'star', ...props}),
   }
+  const homeOptions = {
+    tabBarIcon: (props) => tabBarIcon({name: 'home', ...props}),
+  }
   const HomeTabs = () =>
     <Tab.Navigator screenOptions={tabBarOptions}>
+      <Tab.Screen name='Menus' component={HomeScreen} options={homeOptions}/>
       <Tab.Screen name='My Orders' component={OrdersList} options={ordersOptions}/>
       <Tab.Screen name='Our Products' component={Products} options={productsOptions}/>
       <Tab.Screen name='Select Model' component={SelectModel} options={selectModelOptions}/>

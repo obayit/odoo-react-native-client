@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { mapping, light, dark } from '@eva-design/eva';
 import { View, Platform, StatusBar } from 'react-native';
-import { ApplicationProvider, IconRegistry } from '@ui-kitten/components';
-import { EvaIconsPack } from '@ui-kitten/eva-icons';
 import { AppNavigator } from './src/navigation/app.navigator';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Provider } from 'react-redux'
@@ -90,16 +88,13 @@ export default () => {
         <View style={{ width: '100%', height: '100%' }} onLayout={onLayout}>
             <Provider store={store}>
                 <PersistGate loading={null} persistor={persistor}>
-                    <IconRegistry icons={EvaIconsPack} />
-                    <ApplicationProvider mapping={customMapping} theme={{ ...light, ...theme }}>
-                        <SafeAreaProvider>
-                            {/* <PersistGate loading={null} persistor={persistor}> */}
-                            <APIErrorProvider>
-                                <AppNavigator />
-                            </APIErrorProvider>
-                            {/* </PersistGate> */}
-                        </SafeAreaProvider>
-                    </ApplicationProvider>
+                    <SafeAreaProvider>
+                        {/* <PersistGate loading={null} persistor={persistor}> */}
+                        <APIErrorProvider>
+                            <AppNavigator />
+                        </APIErrorProvider>
+                        {/* </PersistGate> */}
+                    </SafeAreaProvider>
                 </PersistGate>
             </Provider>
         </View>

@@ -13,6 +13,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import { useLoginMutation } from '../../common/store/reduxApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { selectAuth, selectConfiguration, setAuth, setConfiguration } from '../../common/store/authSlice';
+import DebugView from '../../components/DebugView';
 
 export const PersonIcon = (style) => (
   <Icon {...style} name='person' />
@@ -56,13 +57,10 @@ export default ({ navigation }) => {
     setIsLoading(true);
     const password = data.password;
     let login = data.login;
-    if (!login.includes('@') && login && login[0] === 's') {
-      login = login[0].toUpperCase() + login.slice(1);
-    }
     try {
       login = login.trim();
       // NOTE: unwraps either returns the success response, or throws an error
-      let auth = await loginMethod({ login, password }).unwrap();  // use .unwrap() here?
+      let auth = await loginMethod({ login, password, db: data.database }).unwrap();  // use .unwrap() here?
       dispatch(setAuth({ ...auth }))
       const response = {};
       if (response) {  // response is uid
@@ -171,6 +169,7 @@ export default ({ navigation }) => {
               onSubmitEditing: handleSubmit(onSignInButtonPress),
             }} />
         </FormProvider>
+        <DebugView />
 
         <Button disabled={isLoading} onPress={handleSubmit(onSignInButtonPress)} style={styles.submitButton}>Login</Button>
         <Button status='control' onPress={testAddError} style={styles.submitButton}>Test Error Modal</Button>

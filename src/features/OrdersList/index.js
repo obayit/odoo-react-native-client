@@ -47,7 +47,7 @@ export default ({ navigation, route }) => {
     const rs = useStyleSheet(ReusableStyles);
 
     const onLogout = () => dispatch(logOut());
-    const { useQuery } = injectQuery('sale.order', { fields: [
+    const { useQuery } = injectQuery('pos.order', { fields: [
         'id',
         'name',
         'state',

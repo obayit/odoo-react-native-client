@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { CheckBox, Card, Modal, Spinner, Input, Button, Text, Layout, useStyleSheet, StyleService, ButtonGroup } from '@ui-kitten/components';
-import { Image, View } from 'react-native';
+// import { CheckBox, Card, Modal, Spinner, Input, Button, Text, Layout, useStyleSheet, StyleService, ButtonGroup } from '@ui-kitten/components';
+import { Image, Modal, View } from 'react-native';
 import { ReusableStyles } from '../styles';
 
 export default ({ showModal, setShowModal, parentOnYes, parentOnNo, header, body, confirmLabel, yesLabel, dangerText, type, onDone, style, hideOnBackdropPress }) => {
