@@ -40,3 +40,7 @@ export function ErrorIcon () {
 export function DangerIcon () {
   return <MaterialIcons name='warning-amber' size={40} color={colors.color_danger_400}/>
 }
+
+export function SettingsIcon () {
+  return <MaterialIcons name='settings' size={20} />
+}

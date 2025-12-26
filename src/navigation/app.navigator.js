@@ -109,10 +109,10 @@ const styles = StyleSheet.create({
     letterSpacing: 0.6,
   },
   headerStyle: {
-    backgroundColor: 'color-info-700',
+    backgroundColor: colors.color_info_700,
   },
   headerTitleStyle: {
-    color: 'color-primary-default',
+    color: colors.color_primary_600,
     fontSize: 32,
     fontFamily: 'Roboto_700Bold',
   },

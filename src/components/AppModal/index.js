@@ -22,8 +22,6 @@ export default ({ showModal, setShowModal, parentOnYes, parentOnNo, header, body
     setShowModal(false);
   }
 
-  console.log('#type');
-  console.log(type);
   let IconComponent = InfoIcon;
   if(type === 'success'){
     IconComponent = SuccessIcon;

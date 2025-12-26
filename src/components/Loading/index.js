@@ -3,10 +3,8 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 export default function Loading({text, status='primary', style, isLoading}) {
   if(!isLoading){
-    console.log('loading NOT activated');
     return null;
   }
-    console.log('loading activated');
   return(
     <View style={[styles.spinnerContainer, style]}>
       {/* todo: add color to the indicator based on status */}

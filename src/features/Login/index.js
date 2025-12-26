@@ -1,5 +1,7 @@
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
 import { ImageBackground, Image, Keyboard, View, Pressable, StyleSheet, Text, ScrollView } from 'react-native';
+import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+
 
 import { renderPasswordIcon, TextInput, Loading, FeatureContainer, ReusableStyles } from '../../components';
 
@@ -16,7 +18,7 @@ import DebugView from '../../components/DebugView';
 import { CustomButton } from '../../components/CustomButtons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { CustomSpacer } from '../../components/Utils';
-import PaperModalExample from '../../components/Stuff';
+import { SettingsIcon } from '../../components/icons';
 
 export const PersonIcon = (style) => (
   <MaterialCommunityIcons {...style} name='person' />
@@ -27,6 +29,7 @@ export default ({ navigation }) => {
   const auth = useSelector(selectAuth);
   const dispatch = useDispatch();
   const rememberMe = useState(false);  // FIXME: move remember me into a reusable redux, and use it in the remember me component instead of passing it from every auth related page
+  const [settingsVisible, setSettingsVisible] = React.useState(false);
 
   const [passwordVisible, setPasswordVisible] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
@@ -55,7 +58,6 @@ export default ({ navigation }) => {
   const { addError } = errorApi
 
   const onSignInButtonPress = async (data) => {
-    console.log('#onSignInButtonPress');
     setPasswordVisible(false);
     setIsLoading(true);
     const password = data.password;
@@ -63,10 +65,7 @@ export default ({ navigation }) => {
     try {
       login = login.trim();
       // NOTE: unwraps either returns the success response, or throws an error
-      console.log('#await loginMethod');
       let auth = await loginMethod({ login, password, db: data.database }).unwrap();  // use .unwrap() here?
-      console.log('#auth');
-      console.log(auth);
       dispatch(setAuth({ ...auth }))
       const response = {};
       if (response) {  // response is uid
@@ -79,8 +78,6 @@ export default ({ navigation }) => {
         }
       }
     } catch (ex) {
-      console.log('#ex');
-      console.log(ex);
       const error_message = getRtkErrorMessage(ex)
       addError(`Login failed:\n${error_message}`);  // translate me
     } finally {
@@ -155,21 +152,34 @@ export default ({ navigation }) => {
         contentContainerStyle={styles.scrollContainer}
       >
         <FormProvider {...formMethods}>
-          <TextInput name='base_url' label='URL' {...commonInputProps}
-            onChangeCallBack={updateUrl}
-            inputProps={{
-              autoCapitalize: 'none',
-              accessoryRight: PersonIcon,
-              onSubmitEditing: () => passwordInput.current.focus(),
-            }} />
-          <TextInput name='database' label='Database' {...commonInputProps}
-            onChangeCallBack={updateDatabase}
-            inputProps={{
-              autoCapitalize: 'none',
-              accessoryRight: PersonIcon,
-              onSubmitEditing: () => passwordInput.current.focus(),
-            }} />
-          <CustomSpacer />
+
+          <View style={styles.settingsIconContainer}>
+            <CustomButton onPress={() => setSettingsVisible(!settingsVisible)} icon={() => <SettingsIcon />} />
+          </View>
+          {settingsVisible ?
+            <Animated.View
+              key={'uniqueKey'}
+              entering={FadeIn.duration(400)}
+              exiting={FadeOut.duration(400)}
+              // exiting animation doesn't work, at least on debugging mode, maybe it will work in production
+            >
+              <TextInput name='base_url' label='URL' {...commonInputProps}
+                onChangeCallBack={updateUrl}
+                inputProps={{
+                  autoCapitalize: 'none',
+                  accessoryRight: PersonIcon,
+                  onSubmitEditing: () => passwordInput.current.focus(),
+                }} />
+              <TextInput name='database' label='Database' {...commonInputProps}
+                onChangeCallBack={updateDatabase}
+                inputProps={{
+                  autoCapitalize: 'none',
+                  accessoryRight: PersonIcon,
+                  onSubmitEditing: () => passwordInput.current.focus(),
+                }} />
+              <CustomSpacer height={40}/>
+            </Animated.View>
+            : null}
           <TextInput name='login' label='Login' {...commonInputProps}
             inputProps={{
               autoCapitalize: 'none',
@@ -184,19 +194,15 @@ export default ({ navigation }) => {
               secureTextEntry: disablePasswordVisible || !passwordVisible,
               onSubmitEditing: handleSubmit(onSignInButtonPress),
             }} />
-          <Text>Result: {JSON.stringify(loginMutationQuery.data)}</Text>
-          <Text>errors: {JSON.stringify(formMethods.formState.errors)}</Text>
-          <PaperModalExample />
 
         </FormProvider>
-        <DebugView />
-
-        <CustomButton disabled={isLoading} onPress={handleSubmit(onSignInButtonPress)} style={styles.submitButton}>Login</CustomButton>
-        <CustomButton status='control' onPress={testAddError} style={styles.submitButton}>Test Error Modal</CustomButton>
+        {/* <DebugView /> */}
+        <CustomButton disabled={isLoading} onPress={handleSubmit(onSignInButtonPress)} style={styles.submitButton} icon='login'>Login</CustomButton>
+        {/* <CustomButton status='control' onPress={testAddError} style={styles.submitButton}>Test Error Modal</CustomButton>
         <CustomButton status='control' onPress={() => errorApi.addError('hi', { type: 'info' })} style={styles.submitButton}>Test Info Modal</CustomButton>
         <CustomButton status='control' onPress={() => errorApi.addError('hi', { type: 'success' })} style={styles.submitButton}>Test Success Modal</CustomButton>
         <CustomButton status='control' onPress={() => errorApi.addError('hi', { type: 'danger' })} style={styles.submitButton}>Test Danger Modal</CustomButton>
-        <CustomButton status='control' onPress={errorApi.removeError} style={styles.submitButton}>remove errors</CustomButton>
+        <CustomButton status='control' onPress={errorApi.removeError} style={styles.submitButton}>remove errors</CustomButton> */}
       </ScrollView>
     </FeatureContainer>
   );
@@ -218,6 +224,13 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     marginTop: 10,
+  },
+  scrollContainer: {
+    margin: 16,
+  },
+  settingsIconContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
   },
 });
 

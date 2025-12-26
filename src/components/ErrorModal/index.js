@@ -61,11 +61,7 @@ export default function ErrorModal() {
     'success': 'Success',
   }
 
-  console.log('#error');
-  console.log(error);
   const { message, ...options } = error;
-  console.log('#message');
-  console.log(message);
 
   if(options){
     if(options.type){
