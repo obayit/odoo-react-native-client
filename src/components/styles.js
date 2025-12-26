@@ -4,8 +4,8 @@ export const ReusableStyles = StyleSheet.create({
   // put all common/reusable styles here
   formContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    // justifyContent: 'center',
+    // alignItems: 'center',
     paddingTop: 10,
     paddingHorizontal: 16,
     backgroundColor: '#EEEEEE',

@@ -30,6 +30,11 @@ export function isResponseOk(response) {
             error_result.action = actions.sessionInvalid;  // FIXME: maybe we do not want this behavior! just say 404 not found, maybe!
         }
     }
+        // console.log('#response =================================== ');
+        // console.log(response);
+        // console.log(response?.error)
+        // console.log(response?.error?.message)
+        // console.log('-----------------------------------------------');
     // checking for custom api errors
     if (response && response.result && response.result.success === false){
         // console.debug('@@@ about to flag error in isResponseOk');
@@ -41,6 +46,9 @@ export function isResponseOk(response) {
             // TODO: make sure this general error message is ok
             error_result.message = 'Something went wrong!'  // translate me
         }
+    }
+    if (response?.error?.message){
+        error_result.message = response?.error?.message
     }
     if (is_success){
         return success_result

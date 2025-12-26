@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { List, ListItem, Text, StyleService, useStyleSheet, Icon, Button, Input } from '@ui-kitten/components';
+import { Text, FlatList, View, StyleSheet } from 'react-native';
 
 import { FeatureContainer, ReusableStyles } from '../components';
 import { injectQuery } from '../common/store/reduxApi';
 
 const Item = ({ item }) => {
-  const rs = useStyleSheet(ReusableStyles)
+  const rs = ReusableStyles
   return (
     <View style={rs.listItem}>
       <View style={rs.containerRawSpaceBetween}>
@@ -18,7 +17,7 @@ const Item = ({ item }) => {
 }
 
 export default ({ navigation, route }) => {
-  const rs = useStyleSheet(ReusableStyles);
+  const rs = ReusableStyles;
 
   const { useQuery } = injectQuery('ir.ui.menu');
   const query = useQuery({
@@ -46,7 +45,7 @@ export default ({ navigation, route }) => {
     <FeatureContainer loading={isLoading}>
       <View style={rs.listContainer}>
         {/* refresh with pull down */}
-        <List
+        <FlatList
           style={rs.list}
           data={data?.records}
           renderItem={props => <Item {...props} />}
@@ -56,6 +55,6 @@ export default ({ navigation, route }) => {
   );
 };
 
-const themedStyles = StyleService.create({
+const styles = StyleSheet.create({
 
 });

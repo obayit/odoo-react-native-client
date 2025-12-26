@@ -9,11 +9,11 @@ export default function useAPIError() {
   const errors = useSelector(selectErrors)
   const error = errors?.length ? errors[errors.length - 1] : false
   const dispatch = useDispatch()
-  const addErrorWrapper = (error) => {
-    dispatch(addError(error))
+  const addErrorWrapper = (error, options) => {
+    dispatch(addError({ message: error, ...options }))
   }
   const removeError = () => {
-    dispatch(clearErrors)
+    dispatch(clearErrors())
   }
   return { error, addError: addErrorWrapper, removeError };
 }

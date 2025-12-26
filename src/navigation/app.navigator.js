@@ -1,7 +1,6 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { StyleService, useStyleSheet, useTheme } from '@ui-kitten/components';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -15,19 +14,19 @@ import EditProduct from '../features/EditProduct/';
 import SelectModel from '../features/SelectModel';
 import OrdersList from '../features/OrdersList';
 import HomeScreen from '../features/HomeScreen';
+import colors from '../components/colors';
+import { StyleSheet } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const useHeaderOptions = () => {
-  const theme = useTheme()
-  const styles = useStyleSheet(themedStyles);
   return {
     options: {
       headerShown: true,
       // headerTransparent: true,
       headerTitleAlign: 'center',
-      headerTintColor: theme['color-primary-default'],
+      headerTintColor: colors.color_primary_600,
       headerTitleStyle: styles.headerTitleStyle,
       headerStyle: styles.headerStyle,
     }
@@ -35,8 +34,6 @@ const useHeaderOptions = () => {
 }
 
 const HomeNavigator = () => {
-  console.log('#Render :: HomeNavigator')
-  const styles = useStyleSheet(themedStyles);
   const commonHeaderOptions = useHeaderOptions();
 
   const tabBarOptions = {
@@ -85,9 +82,6 @@ const HomeNavigator = () => {
 }
 
 const AuthNavigator = () => {
-  console.log('#Render :: AuthNavigator')
-  const styles = useStyleSheet(themedStyles);
-  const theme = useTheme()
   const commonHeaderOptions = useHeaderOptions();
   return(
   <Stack.Navigator screenOptions={commonHeaderOptions.options}>
@@ -105,7 +99,7 @@ export const AppNavigator = () => {
   );
 }
 
-const themedStyles = StyleService.create({
+const styles = StyleSheet.create({
   tabBarStyle:{
     backgroundColor: '#FAFAFA',
   },

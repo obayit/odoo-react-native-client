@@ -1,17 +1,18 @@
 import React from "react"
+import { View } from 'react-native'
 
-export function InputWrapper({ name, childStyle, errors, children }) {
+export function InputWrapper({ name, childStyle, errors, children, style }) {
   // get the margins from the input's style
   const errorStyle = getMarginFromStyle(childStyle)
   return (
-    <>
+    <View style={style}>
       {children}
       {errors && errors[name] && (
         <Text status="danger" style={errorStyle}>
           {errors[name]?.message}
         </Text>
       )}
-    </>
+    </View>
   )
 }
 

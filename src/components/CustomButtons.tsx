@@ -1,6 +1,5 @@
-import { Button } from "react-native"
+import { Button } from 'react-native-paper';
 
 export function CustomButton(props){
-    const { children, ...otherProps } = props
-    return <Button {...otherProps} title={children} />
+    return <Button {...props} />
 }

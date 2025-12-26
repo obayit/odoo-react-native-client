@@ -1,5 +1,5 @@
 import React from 'react';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+// import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 
 
 /**
@@ -16,12 +16,13 @@ const KeyboardAvoiding = (props) => {
     alwaysBounceVertical: false,
     alwaysBounceHorizontal: false,
   };
+  return null
 
-  return React.createElement(KeyboardAwareScrollView, {
-    enableOnAndroid: true,
-    ...defaultProps,
-    ...props,
-  });
+  // return React.createElement(KeyboardAwareScrollView, {
+  //   enableOnAndroid: true,
+  //   ...defaultProps,
+  //   ...props,
+  // });
 };
 
 export function KeyboardAvoidingView ({children, style, ...props}) {

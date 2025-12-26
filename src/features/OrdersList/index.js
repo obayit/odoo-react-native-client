@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { List, ListItem, Text, StyleService, useStyleSheet, Icon, Button, Input } from '@ui-kitten/components';
+import { Text, FlatList, View } from 'react-native';
 
 import { ReusableStyles, FeatureContainer, Loading } from '../../components';
 
@@ -10,13 +9,8 @@ import { injectQuery } from '../../common/store/reduxApi';
 import { displayDate, displayM2o, fLCapital } from '../../common/utils/commonComponentLogic';
 import OrderLineItems from '../../components/OrderLineItems';
 
-const Item2 = ({ item: record }) => {
-    const styles = useStyleSheet(ReusableStyles)
-    return <ListItem title={`${record?.id}: ${record?.create_date}`} style={styles.listItem}/>
-}
-
 const State = ({ state }) => {
-  const rs = useStyleSheet(ReusableStyles)
+  const rs = ReusableStyles
   let status = 'default'
   if(state === 'sale'){
     status = 'success'
@@ -29,7 +23,7 @@ const State = ({ state }) => {
 }
 
 const Item = ({ item: record }) => {
-    const rs = useStyleSheet(ReusableStyles)
+    const rs = ReusableStyles
     return (
     <View style={rs.listItem}>
         <View style={rs.containerRawSpaceBetween}>
@@ -44,7 +38,7 @@ const Item = ({ item: record }) => {
 export default ({ navigation, route }) => {
     const dispatch = useDispatch();
 
-    const rs = useStyleSheet(ReusableStyles);
+    const rs = ReusableStyles;
 
     const onLogout = () => dispatch(logOut());
     const { useQuery } = injectQuery('pos.order', { fields: [
@@ -65,7 +59,7 @@ export default ({ navigation, route }) => {
         <FeatureContainer loading={isLoading}>
             <View style={rs.listContainer}>
                 {/* refresh with pull down */}
-                <List
+                <FlatList
                     style={rs.list}
                     data={data?.records}
                     renderItem={props => <Item {...props}/>}
@@ -74,7 +68,3 @@ export default ({ navigation, route }) => {
         </FeatureContainer>
     );
 };
-
-const themedStyles = StyleService.create({
-
-});

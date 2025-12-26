@@ -7,9 +7,8 @@ function DebugView() {
   return (
     <View style={styles.debugContainer}>
       <Text style={styles.titleText}>Debugging View:</Text>
-      <Text>process.env.REACT_APP_ODOO_URL = "{process.env.REACT_APP_ODOO_URL}"</Text>
-      <Text>process.env.REACT_APP_ODOO_DB = "{process.env.REACT_APP_ODOO_DB}"</Text>
-      <Text>process.env.EXPO_PUBLIC_API_URL = "{process.env.EXPO_PUBLIC_API_URL}"</Text>
+      <Text>process.env.EXPO_PUBLIC_ODOO_URL = "{process.env.EXPO_PUBLIC_ODOO_URL}"</Text>
+      <Text>process.env.EXPO_PUBLIC_ODOO_DB = "{process.env.EXPO_PUBLIC_ODOO_DB}"</Text>
       <Button onPress={debugHook.clearRtkQuery} title='Clear RTK Query' color='#8A0000'/>
     </View>
   )

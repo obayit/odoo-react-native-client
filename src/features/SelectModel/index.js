@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { List, ListItem, Text, StyleService, useStyleSheet, Icon, Button, Input } from '@ui-kitten/components';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { ReusableStyles, FeatureContainer, TextInput } from '../../components';
 
@@ -8,11 +7,11 @@ import * as yup from "yup";
 import { useYupValidationResolver } from '../../common/utils/commonComponentLogic';
 import { FormProvider, useForm } from 'react-hook-form';
 import useLogout from '../../hooks/useLogout';
+import { CustomButton } from '../../components/CustomButtons';
 
 
 export default ({ navigation }) => {
-    const rs = useStyleSheet(ReusableStyles);
-    const styles = useStyleSheet(themedStyles);
+    const rs = ReusableStyles
     const logoutHelper = useLogout()
 
     const onPress = (data) => {
@@ -35,15 +34,15 @@ export default ({ navigation }) => {
                 <FormProvider {...formMethods}>
                     <Text>Please enter a model name that has a name field e.g: res.users</Text>
                     <TextInput label="Model" name='model'/>
-                    <Button style={rs.searchButton} onPress={handleSubmit(onPress)}>Search</Button>
-                    <Button style={styles.logoutButton} onPress={logoutHelper.logout} status='danger'>Logout</Button>
+                    <CustomButton style={rs.searchButton} onPress={handleSubmit(onPress)}>Search</CustomButton>
+                    <CustomButton style={styles.logoutButton} onPress={logoutHelper.logout} status='danger'>Logout</CustomButton>
                 </FormProvider>
             </View>
         </FeatureContainer>
     );
 };
 
-const themedStyles = StyleService.create({
+const styles = StyleSheet.create({
     logoutButton: {
 
     },

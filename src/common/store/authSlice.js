@@ -3,17 +3,17 @@ import { Platform } from "react-native"
 
 const initialState = { uid: null }
 const defaultDb = 'v16pos'
-const defaultUrl = 'http://192.168.1.101:8016'
+const defaultUrl = 'http://192.168.1.2:8069'
 
 const initialConfigurationState = {
-  baseUrl: process.env.REACT_APP_ODOO_URL ?? defaultUrl,
-  database:  process.env.REACT_APP_ODOO_DB ?? defaultDb,
+  baseUrl: process.env.EXPO_PUBLIC_ODOO_URL ?? defaultUrl,
+  database:  process.env.EXPO_PUBLIC_ODOO_DB ?? defaultDb,
 }
 const initialErrorsState = []
 
 const initialConfigurationStateWeb = {
   baseUrl: '',
-  database: process.env.REACT_APP_ODOO_DB ?? defaultDb,
+  database:  process.env.EXPO_PUBLIC_ODOO_DB ?? defaultDb,
 }
 
 const authSlice = createSlice({

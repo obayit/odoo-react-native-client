@@ -1,16 +1,16 @@
-import { Text, useStyleSheet } from "@ui-kitten/components";
+import CustomText from "../components/CustomText";
 import { ReusableStyles } from "../components/styles";
 
 const InputLabel = ({label, labelStyle, ...props}) => {
-  props.style.push(labelStyle);
-  return <Text {...props}>{label}</Text>;
+  props.style?.push(labelStyle);
+  return <CustomText {...props}>{label}</CustomText>;
 }
 
 export const useLabelStyle = (label, labelStyle) => {
   if(!label){
     return null;
   }
-  const reusableStyles = useStyleSheet(ReusableStyles);
+  const reusableStyles = ReusableStyles
   if(!labelStyle){
     labelStyle = reusableStyles.labelStyle;
     let strLabel = label;

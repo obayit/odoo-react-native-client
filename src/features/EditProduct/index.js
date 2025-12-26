@@ -1,20 +1,18 @@
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
-import { View, ScrollView } from 'react-native';
-import { List, ListItem, Text, StyleService, useStyleSheet, Icon, Button } from '@ui-kitten/components';
+import { StyleSheet, View } from 'react-native';
 
-import { TextInput, ReusableStyles, FeatureContainer, Loading } from '../../components';
+import { TextInput, ReusableStyles, FeatureContainer } from '../../components';
 
-import useAPIError from '../../common/hooks/useAPIError';
-import { useDispatch, useSelector } from 'react-redux';
-import { logOut, selectAuth, setAuth } from '../../common/store/authSlice';
+import { useDispatch } from 'react-redux';
+import { logOut } from '../../common/store/authSlice';
 import { useProductsQuery } from '../../common/store/reduxApi';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import { displayM2O } from '../../common/utils/parseData';
 import { FormProvider } from 'react-hook-form';
 import useForm from '../../common/hooks/useForm';
+import { MaterialIcons } from '@expo/vector-icons';
+import { CustomButton } from '../../components/CustomButtons';
 
 export const PersonIcon = (style) => (
-    <Icon {...style} name='person' />
+    <MaterialIcons {...style} name='person' />
 );
 
 
@@ -23,8 +21,7 @@ export default ({ navigation, route }) => {
     const { record } = route.params;
     const { data, isLoading } = useProductsQuery();
 
-    const styles = useStyleSheet(themedStyles);
-    const rs = useStyleSheet(ReusableStyles);
+    const rs = ReusableStyles;
 
     const onLogout = () => dispatch(logOut());
 
@@ -58,7 +55,7 @@ export default ({ navigation, route }) => {
                     <TextInput field={fieldName} />
                     <TextInput field={fieldBarcode} />
 
-                    <Button onPress={onLogout}>Logout</Button>
+                    <CustomButton onPress={onLogout}>Logout</CustomButton>
 
                 </FormProvider>
             </View>
@@ -66,5 +63,5 @@ export default ({ navigation, route }) => {
     );
 };
 
-const themedStyles = StyleService.create({
+const styles = StyleSheet.create({
 });
