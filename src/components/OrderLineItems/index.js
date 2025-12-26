@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View } from 'react-native';
-import { Text, useStyleSheet, StyleService } from '@ui-kitten/components';
+import { Text, ScrollView, StyleSheet, View } from 'react-native';
 
 import { ReusableStyles } from '..';
 
@@ -8,24 +7,24 @@ import { injectQuery } from '../../common/store/reduxApi';
 import { displayM2o } from '../../common/utils/commonComponentLogic';
 
 const HorizontalItem = ({children}) => {
-    const rs = useStyleSheet(ReusableStyles)
+    const rs = ReusableStyles
     return <View style={rs.horizontalItem}>{children}</View>
 }
 
 export default ({ recordIds, orderId }) => {
-    const { useQuery } = injectQuery('sale.order.line', {
-        fields: [
-            'id',
-            'product_id',
-            'product_uom_qty',
-        ],
-        domain: [['id', 'in', recordIds]],
-        reduxNameSuffix: `,sale.order,${orderId}`,
-    });
-    const { data, isLoading, refetch } = useQuery();
+    const { useQuery } = injectQuery('sale.order.line')
+    const { data, isLoading, refetch } = useQuery({
+        args: {
+            fields: [
+                'id',
+                'product_id',
+                'product_uom_qty',
+            ],
+            domain: [['id', 'in', recordIds]],
+        },
+    })
 
-    const styles = useStyleSheet(themedStyles)
-    const rs = useStyleSheet(ReusableStyles)
+    const rs = ReusableStyles
     if(data?.records?.length){
         return (
             <ScrollView horizontal={true} style={styles.container}>
@@ -39,7 +38,7 @@ export default ({ recordIds, orderId }) => {
     }
 };
 
-const themedStyles = StyleService.create({
+const styles = StyleSheet.create({
   container: {
     margin: 5,
     marginTop: 0,

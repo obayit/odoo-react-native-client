@@ -1,6 +1,5 @@
 import React from "react"
-import { View } from "react-native"
-import { StyleService } from "@ui-kitten/components"
+import { StyleSheet, View } from "react-native"
 import Spinner from "react-native-loading-spinner-overlay"
 
 export const LoadingOverlay = ({ loading }) => {
@@ -16,7 +15,7 @@ export const LoadingOverlay = ({ loading }) => {
   )
 }
 
-const styles = StyleService.create({
+const styles = StyleSheet.create({
   spinnerTextStyle: {
     color: "#fff"
   }

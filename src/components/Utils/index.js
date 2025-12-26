@@ -1,6 +1,5 @@
 import React from 'react';
 import { Pressable } from 'react-native';
-import { Icon, StyleService } from '@ui-kitten/components';
 
 export const renderPasswordIcon = ({onPress, passwordVisible, ...props}) => {
   return(
@@ -10,5 +9,13 @@ export const renderPasswordIcon = ({onPress, passwordVisible, ...props}) => {
   );
 }
 
-const themedStyles = StyleService.create({
-});
+/*
+    npm uninstall @react-navigation/bottom-tabs @react-navigation/native @react-navigation/stack
+
+    "@react-navigation/bottom-tabs": "^7.9.0",
+    "@react-navigation/native": "^7.1.26",
+    "@react-navigation/stack": "^7.6.13",
+    npm uninstall @expo/webpack-config @expo/dom-webview
+
+    react-hook-form yup @react-navigation/bottom-tabs @react-navigation/native @react-navigation/stack 
+*/

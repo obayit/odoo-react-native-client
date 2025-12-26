@@ -1,14 +1,4 @@
 // this file contains common component logic that is specific to the ui library (e.g: UI Kitten)
-import { IndexPath } from '@ui-kitten/components';
-
-export function getIndexPath(records, compareValue, compare=(item, compareValue) => item.id === compareValue){
-    for(let i=0; i<records.length; i++) {
-        let item = records[i];
-        if(compare(item, compareValue)){
-            return new IndexPath(i);
-        }
-    }
-}
 
 export function getMarginFromStyle(style){
   // here we only are looking for the margin value of the original input, so that the error message will align with that input

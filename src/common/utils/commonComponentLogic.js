@@ -75,3 +75,15 @@ export const useYupValidationResolver = validationSchema =>
     [validationSchema]
     );
 
+export function getRtkErrorMessage(error){
+    if(isString(error)){
+        return error
+    }
+    if(error?.error){
+        return error?.error
+    }
+    if (error) {
+        return error + ''
+    }
+    return 'Error'
+}

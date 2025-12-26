@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import useAPIError from '../../common/hooks/useAPIError';
-import { useStyleSheet, StyleService } from '@ui-kitten/components';
 import { actions } from '../../common/providers/APIErrorProvider';
 import { useNavigation } from '@react-navigation/native';
 import { View, Platform, Linking, Alert } from 'react-native'
@@ -55,17 +54,20 @@ export default function ErrorModal() {
 
   let type = 'error';
   let header = 'Error';
-
-  let options = {};
-  if(error?.options){
-    options = error.options;
+  const headerData = {
+    'error': 'Error',
+    'info': 'Info',
+    'danger': 'Danger',
+    'success': 'Success',
   }
+
+  const { message, ...options } = error;
 
   if(options){
     if(options.type){
       type = options.type;
-      if(type === 'success'){
-        header = 'Success'
+      if(headerData[type]){
+        header = headerData[type]
       }
     }
     if(options.header){
@@ -103,13 +105,10 @@ export default function ErrorModal() {
   }
 
   let buttonText = 'OK';
-  if(error && error.action === actions.updateRequired){
-    buttonText = 'Upgrade';
-  }
 
   return (
-    <AppModal showModal={error} setShowModal={onOk} type={type}
-    header={header} body={(error && error.message) ? error.message : ''} yesLabel={buttonText}
+    <AppModal showModal={Boolean(error)} setShowModal={onOk} type={type}
+    header={header} body={message} yesLabel={buttonText}
     onDone={onOk}
     />
   );

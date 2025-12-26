@@ -1,50 +1,54 @@
 import React from 'react';
-import { Input } from '@ui-kitten/components';
-import { Controller, useFormContext } from 'react-hook-form';
+import { Controller, useController, useFormContext } from 'react-hook-form';
 import { useLabelStyle } from '../../hooks/useLabelStyle';
 import { InputWrapper } from '../InputWrapper';
+import { Text, StyleSheet, View } from 'react-native';
+import { TextInput } from 'react-native-paper';
 
 export default function TextInputInner({ name, style, label, inputProps, onChangeCallBack, onBlurCallBack, labelStyle, field }) {
-    label = required ? label + ' *' : label;
-    label = useLabelStyle(label, labelStyle);
-    let required = false;
-    if(field){
-        name = field.name;
-        required = field.required;
-        label = field.label;
-    }
-    return (
-        <ConnectForm>
-            {({ control, errors }) =>
-                <Controller
-                    name={name}
-                    control={control}
-                    render={({ field: { onChange, onBlur, value } }) => (
-                        <InputWrapper name={name} childStyle={style} errors={errors}>
-                            <Input
-                                label={label}
-                                value={value}
-                                style={style}
-                                onChangeText={value => {
-                                    onChange(value);
-                                    onChangeCallBack && onChangeCallBack(value)
-                                }}
-                                onBlur={e => {
-                                    onBlur();
-                                    onBlurCallBack && onBlurCallBack(value)
-                                }}
-                                {...inputProps}
-                            />
-                        </InputWrapper>
-                    )}
-                />
-            }
-        </ConnectForm>
-    );
+  label = required ? label + ' *' : label;
+  let required = false;
+  if (field) {
+    name = field.name;
+    required = field.required;
+    label = field.label;
+  _}
+
+  const methods = useFormContext();
+  const {
+    field: formField,
+    fieldState: { invalid, isTouched, isDirty },
+    formState: { touchedFields, dirtyFields, errors }
+  } = useController({ name, control: methods.control })
+
+  return (
+    <InputWrapper name={name} childStyle={style} errors={errors}>
+      <TextInput
+        label={label}
+        value={formField.value}
+        onChangeText={value => {
+          formField.onChange(value);
+          onChangeCallBack && onChangeCallBack(value)
+        }}
+        onBlur={e => {
+          formField.onBlur();
+          onBlurCallBack && onBlurCallBack(formField.value)
+        }}
+        style={style ?? styles.input}
+        {...inputProps}
+      />
+    </InputWrapper>
+  )
 }
 
-export const ConnectForm = ({ children }) => {
-    const methods = useFormContext();
-    // NOTE: passing methods this way causes unnecessary rerenders, see the official react-hook-form docs for how to optimize this if needed
-    return children({ ...methods });
-};
+// export const ConnectForm = ({ children }) => {
+//     const methods = useFormContext();
+//     // NOTE: passing methods this way causes unnecessary rerenders, see the official react-hook-form docs for how to optimize this if needed
+//     return children({ ...methods });
+// };
+
+const styles = StyleSheet.create({
+  input: {
+    marginBottom: 8,
+  },
+})

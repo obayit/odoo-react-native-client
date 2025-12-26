@@ -3,31 +3,7 @@ import { FetchBaseQueryError, createApi, fetchBaseQuery } from '@reduxjs/toolkit
 import { isResponseOk } from '../api/odoo_request';
 
 const defaultFields = ['id', 'name'];
-
-function composeParams(model, options = {}) {
-  let domain = options.domain ? options.domain : [];
-  let sort = options.sort ? options.sort : 'create_date desc';
-  let limit = options.limit ? options.limit : 100;
-  let fields = options.fields ? options.fields : [];
-  if (!fields.length) {
-    switch (model) {
-      case 'res.partner':
-        fields = defaultFields;
-        break;
-
-      default:
-        fields = defaultFields;
-        break;
-    }
-  }
-  return {
-    model,
-    domain,
-    limit,
-    sort,
-    fields,
-  }
-}
+const KEEP_UNUSED_DATA_FOR = 60  // cache time in seconds (60, is the default value)
 
 // *****************************************************
 
@@ -90,14 +66,23 @@ function baseOdooRequest({ url, params }) {
   }
 }
 
-function getCommonSearchQuery(objName, options) {
+// function getCommonSearchQuery(model: OdooModel, options: any = {}) {
+function getCommonSearchQuery(
+  model: OdooModel,
+) {
   return {
-    query: () => (baseOdooRequest({
-      url: '/web/dataset/search_read',
-      params: composeParams(objName, options),
-    })),
+    query: (params: any = {}) => {
+      const args = { ...params.args };
+      args.model = model
+      args.domain = args.domain ?? [];
+      args.fields = args.fields ?? defaultFields;
+      return baseOdooRequest({
+        url: '/web/dataset/search_read',
+        params: args ,
+      });
+    },
     // transformResponse: (response) => response.result.records,
-  }
+  };
 }
 
 // Define a service using a base URL and expected endpoints
@@ -106,7 +91,7 @@ export const odooApi = createApi({
   baseQuery: baseQueryWithInterceptor,
   endpoints: (builder) => ({
     getPartners: builder.query(getCommonSearchQuery('res.partner')),
-    products: builder.query(getCommonSearchQuery('product.product', { fields: ['id', 'name', 'list_price', 'currency_id'] })),
+    products: builder.query(getCommonSearchQuery('product.product')),
     writePartner: builder.mutation({
       query: (data) => ({
         url: '/TODO/write_api_here',
@@ -124,11 +109,7 @@ export const odooApi = createApi({
       query: (data) => {
         return (baseOdooRequest({
         url: '/web/session/authenticate',
-        params: {
-          db: 'v15react',  // FIXME: make database name configurable
-          login: data.login,
-          password: data.password,
-        },
+        params: data,
       }))},
       // Pick out data and prevent nested properties in a hook or selector
       // transformResponse: (response, meta, arg) => {
@@ -159,68 +140,44 @@ export const odooApi = createApi({
 
 const capitalize = (str) => str[0].toUpperCase() + str.slice(1);
 
-export const injectQuery = (model, options) => {
-  let defaultOptions = {
-    fields: ['id', 'name'],
+export const injectQuery = (model, options={}) => {
+  let queryName = model;
+  if (options?.reduxNameSuffix) {
+    queryName += options.reduxNameSuffix;
+    delete options.reduxNameSuffix;
   }
-  options = { ...defaultOptions, ...(options || {}) }
-  let queryName = model
-  if(options?.reduxNameSuffix){
-    queryName += options.reduxNameSuffix
-  }
-  // model.split('.').map(part => queryName += capitalize(part));
+  const tags = [queryName];
+  const customTags = options.customTags || [];
+  tags.push(...customTags);
+  odooApi.enhanceEndpoints({ addTagTypes: tags });
   const api = odooApi.injectEndpoints({
     endpoints: (builder) => ({
-      [queryName]: builder.query(getCommonSearchQuery(model, options)),
+      [queryName]: builder.query({
+        ...getCommonSearchQuery(model),
+        providesTags: (result, error, arg) => {
+          const res = result?.records?.map
+            ? [
+                ...result.records.map(({ id }) => ({
+                  type: model,
+                  id,
+                })),
+                queryName,
+              ]
+            : [queryName];
+          tags.map((item) => !res.includes(item) && res.push(item));
+          return res;
+        },
+        keepUnusedDataFor: KEEP_UNUSED_DATA_FOR,
+      }),
     }),
-    overrideExisting: true,  // TODO: put correct value for thisk
+    overrideExisting: true, // TODO: put correct value for this
   });
   return {
     useQuery: api.endpoints[queryName].useQuery,
-  }
-}
+    useLazyQuery: api.endpoints[queryName].useLazyQuery,
+  };
+};
 
 // Export hooks for usage in functional components, which are
 // auto-generated based on the defined endpoints
 export const { useGetPartnersQuery, useWritePartnerMutation, useLoginMutation, useProductsQuery, useUpdateCartMutation } = odooApi
-
-const meh = {
-  "auth": {
-    "_persist": {
-      "rehydrated": true,
-      "version": -1
-    },
-    "active_ids_limit": 20000,
-    "cache_hashes": {
-      "assets_discuss_public": "7db29ad7d4c5da1b989fce1382ba9eafee4abfbb3fd770cf8e32219eadae34ed",
-      "load_menus": "6476c4ed8312ff36ea86fe14034e9f747e5e38fd91a052109a633aab874eba19",
-      "qweb": "5f0312acf4a02e82fdb2e10c5617c0223420438f0cc0bee99b40d15f12beb289",
-      "translations": "5227498d9df4b403b0244c75aac21e0c091e50ce"
-    },
-    "company_id": 1,
-    "currencies": {
-      "1": [Object],
-      "2": [Object]
-    },
-    "db": "v15react",
-    "display_switch_company_menu": false,
-    "home_action_id": false,
-    "iap_company_enrich": false,
-    "is_admin": true,
-    "is_system": true,
-    "max_file_upload_size": 134217728,
-    "name": "Mitchell Admin",
-    "notification_type": "email",
-    "odoobot_initialized": true,
-    "partner_display_name":
-      "YourCompany, Mitchell Admin",
-    "partner_id": 3,
-    "profile_collectors": null,
-    "profile_params": null,
-    "profile_session": null,
-    "server_version": "15.0",
-    "server_version_info": [15, 0, 0, "final", 0, ""],
-    "show_effect": "True",
-    "support_url": "https://www.odoo.com/buy", "tour_disable": true, "uid": 2, "user_companies": { "allowed_companies": [Object], "current_company": 1 }, "user_context": { "lang": "en_US", "tz": "Africa/Khartoum", "uid": 2 }, "user_id": [2], "username": "admin", "web.base.url": "http://usr5:8015", "web_tours": []
-  }, "odooApi": { "config": { "focused": true, "keepUnusedDataFor": 60, "middlewareRegistered": true, "online": true, "reducerPath": "odooApi", "refetchOnFocus": false, "refetchOnMountOrArgChange": false, "refetchOnReconnect": false }, "mutations": {}, "provided": {}, "queries": { "products(undefined)": [Object] }, "subscriptions": {} }
-}

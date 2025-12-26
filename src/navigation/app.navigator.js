@@ -1,7 +1,6 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { StyleService, useStyleSheet, useTheme } from '@ui-kitten/components';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -14,19 +13,20 @@ import DynamicList from '../features/DynamicList';
 import EditProduct from '../features/EditProduct/';
 import SelectModel from '../features/SelectModel';
 import OrdersList from '../features/OrdersList';
+import HomeScreen from '../features/HomeScreen';
+import colors from '../components/colors';
+import { StyleSheet } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
 const useHeaderOptions = () => {
-  const theme = useTheme()
-  const styles = useStyleSheet(themedStyles);
   return {
     options: {
       headerShown: true,
       // headerTransparent: true,
       headerTitleAlign: 'center',
-      headerTintColor: theme['color-primary-default'],
+      headerTintColor: colors.color_primary_600,
       headerTitleStyle: styles.headerTitleStyle,
       headerStyle: styles.headerStyle,
     }
@@ -34,8 +34,6 @@ const useHeaderOptions = () => {
 }
 
 const HomeNavigator = () => {
-  console.log('#Render :: HomeNavigator')
-  const styles = useStyleSheet(themedStyles);
   const commonHeaderOptions = useHeaderOptions();
 
   const tabBarOptions = {
@@ -63,8 +61,12 @@ const HomeNavigator = () => {
   const ordersOptions = {
     tabBarIcon: (props) => tabBarIcon({name: 'star', ...props}),
   }
+  const homeOptions = {
+    tabBarIcon: (props) => tabBarIcon({name: 'home', ...props}),
+  }
   const HomeTabs = () =>
     <Tab.Navigator screenOptions={tabBarOptions}>
+      <Tab.Screen name='Menus' component={HomeScreen} options={homeOptions}/>
       <Tab.Screen name='My Orders' component={OrdersList} options={ordersOptions}/>
       <Tab.Screen name='Our Products' component={Products} options={productsOptions}/>
       <Tab.Screen name='Select Model' component={SelectModel} options={selectModelOptions}/>
@@ -80,9 +82,6 @@ const HomeNavigator = () => {
 }
 
 const AuthNavigator = () => {
-  console.log('#Render :: AuthNavigator')
-  const styles = useStyleSheet(themedStyles);
-  const theme = useTheme()
   const commonHeaderOptions = useHeaderOptions();
   return(
   <Stack.Navigator screenOptions={commonHeaderOptions.options}>
@@ -100,7 +99,7 @@ export const AppNavigator = () => {
   );
 }
 
-const themedStyles = StyleService.create({
+const styles = StyleSheet.create({
   tabBarStyle:{
     backgroundColor: '#FAFAFA',
   },
@@ -110,10 +109,10 @@ const themedStyles = StyleService.create({
     letterSpacing: 0.6,
   },
   headerStyle: {
-    backgroundColor: 'color-info-700',
+    backgroundColor: colors.color_info_700,
   },
   headerTitleStyle: {
-    color: 'color-primary-default',
+    color: colors.color_primary_600,
     fontSize: 32,
     fontFamily: 'Roboto_700Bold',
   },

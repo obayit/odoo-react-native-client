@@ -32,7 +32,7 @@ export default function APIErrorProvider({ children }) {
 
   const contextValue = {
     error,
-    addError: useCallback((message, onavigationptions) => addError(message, options), []),
+    addError: useCallback((message, options) => addError(message, options), []),
     removeError: useCallback(() => removeError(), [])
   };
 

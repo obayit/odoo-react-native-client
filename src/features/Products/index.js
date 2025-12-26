@@ -1,26 +1,26 @@
 import React, { ReactElement, useEffect, useRef, useState } from 'react';
-import { View, ScrollView } from 'react-native';
-import { List, ListItem, Text, StyleService, useStyleSheet, Icon, Button } from '@ui-kitten/components';
+import { FlatList, View } from 'react-native';
 
 import { ReusableStyles, FeatureContainer, Loading } from '../../components';
 
-import useAPIError from '../../common/hooks/useAPIError';
-import { useDispatch, useSelector } from 'react-redux';
-import { logOut, selectAuth, setAuth } from '../../common/store/authSlice';
+import { useDispatch } from 'react-redux';
+import { logOut } from '../../common/store/authSlice';
 import { useProductsQuery, useUpdateCartMutation } from '../../common/store/reduxApi';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { displayM2O } from '../../common/utils/parseData';
 import { useNavigation } from '@react-navigation/native'
+import CustomListItem from '../../components/CustomListItem';
+import { CustomButton } from '../../components/CustomButtons';
 
 export const PersonIcon = (style) => (
-    <Icon {...style} name='person' />
+    <MaterialCommunityIcons {...style} name='person' />
 );
 
 
 const ProductItem = ({ item: product }) => {
     const navigation = useNavigation()
     const [updateCart, updateCartResult] = useUpdateCartMutation()
-    const styles = useStyleSheet(ReusableStyles)
+    const styles = ReusableStyles
     const addProductToCart = () => {
         // use the updateCart mutation here :)
         updateCart({product_id: product.id});
@@ -34,7 +34,7 @@ const ProductItem = ({ item: product }) => {
         navigation.navigate('Edit Product', {record: product});
     }
     return (
-        <ListItem title={`${product?.name}: ${product?.list_price} ${displayM2O(product?.currency_id)}`} accessoryRight={ProductRightAccessory} onPress={navigateToProductEdit} style={styles.listItem}/>
+        <CustomListItem title={`${product?.name}: ${product?.list_price} ${displayM2O(product?.currency_id)}`} accessoryRight={ProductRightAccessory} onPress={navigateToProductEdit} style={styles.listItem}/>
     );
 }
 
@@ -44,7 +44,7 @@ export default ({ navigation }) => {
 
     const { data, isLoading } = useProductsQuery();
 
-    const styles = useStyleSheet(ReusableStyles);
+    const styles = ReusableStyles
 
     const onLogout = () => dispatch(logOut());
 
@@ -57,17 +57,14 @@ export default ({ navigation }) => {
             <View style={styles.listContainer}>
                 <Loading isLoading={isLoading} />
 
-                <List
+                <FlatList
                     style={styles.list}
                     data={data?.records}
                     renderItem={props => <ProductItem {...props}/>}
                 />
-                <Button onPress={onLogout} style={styles.submitButton}>Logout</Button>
+                <CustomButton onPress={onLogout} style={styles.submitButton}>Logout</CustomButton>
 
             </View>
         </FeatureContainer>
     );
 };
-
-const themedStyles = StyleService.create({
-});

@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { CheckBox, Card, Modal, Spinner, Input, Button, Text, Layout, useStyleSheet, StyleService, ButtonGroup } from '@ui-kitten/components';
-import { Image, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
+import { Modal, Portal } from 'react-native-paper';
 import { ReusableStyles } from '../styles';
+import { CustomButton } from '../CustomButtons';
+import colors from '../colors';
+import { DangerIcon, ErrorIcon, InfoIcon, SuccessIcon } from '../icons';
+import { CustomSpacer } from '../Utils';
 
 export default ({ showModal, setShowModal, parentOnYes, parentOnNo, header, body, confirmLabel, yesLabel, dangerText, type, onDone, style, hideOnBackdropPress }) => {
-  const styles = useStyleSheet(themedStyles);
-  const reusableStyles = useStyleSheet(ReusableStyles);
+  const reusableStyles = ReusableStyles
   const [confirmChecked, setConfirmChecked] = useState(false);
 
   function onYes(){
@@ -19,13 +22,13 @@ export default ({ showModal, setShowModal, parentOnYes, parentOnNo, header, body
     setShowModal(false);
   }
 
-  let icon = require('../../../assets/images/icons/info.png');
+  let IconComponent = InfoIcon;
   if(type === 'success'){
-    icon = require('../../../assets/images/icons/success.png');
+    IconComponent = SuccessIcon;
   }else if (type === 'danger'){
-    icon = require('../../../assets/images/icons/danger.png');
+    IconComponent = DangerIcon;
   }else if (type === 'error'){
-    icon = require('../../../assets/images/icons/error.png');
+    IconComponent = ErrorIcon;
   }
 
   const onBackdropPress = () => {
@@ -35,28 +38,46 @@ export default ({ showModal, setShowModal, parentOnYes, parentOnNo, header, body
   }
 
   return (
-    <Modal style={[styles.container, style]} backdropStyle={styles.backdrop} visible={showModal} onBackdropPress={onBackdropPress}>
-        <Image source={icon} style={styles.icon}/>
-        <Text textType='bold' style={[reusableStyles.largeText, styles.header]}>{header}</Text>
-        {!!body &&
+    // style={[styles.container, style]} backdropStyle={styles.backdrop}
+    <Portal>
+    <Modal visible={showModal} onDismiss={onBackdropPress} contentContainerStyle={styles.containerStyle}>
+    {/* <Modal 
+      animationType="slide"
+      transparent={true}
+      visible={showModal}
+      onRequestClose={onBackdropPress}> */}
+        <CustomSpacer height={40} />
+        <IconComponent />
+        <Text style={styles.header}>{header}</Text>
+        {body ?
           <Text style={[reusableStyles.normalText, styles.bodyText]}>{body}</Text>
-        }
+        : null }
         <View style={styles.buttonContainer}>
-          {parentOnYes &&
+          {parentOnYes ?
           <>
-            <Button onPress={onYes} style={styles.yesButton} disabled={confirmLabel ? !confirmChecked : false}>{yesLabel ? yesLabel : 'Yes'}</Button>
-            <Button status='basic' onPress={onNo} style={[reusableStyles.subtleButton, styles.noButton]}>No</Button>
+            <CustomButton onPress={onYes} style={styles.yesButton} disabled={confirmLabel ? !confirmChecked : false}>{yesLabel ? yesLabel : 'Yes'}</CustomButton>
+            <CustomButton status='basic' onPress={onNo} style={[reusableStyles.subtleButton, styles.noButton]}>No</CustomButton>
           </>
-          }
-          {onDone &&
-            <Button status='primary' onPress={onDone} style={styles.doneButton} disabled={confirmLabel ? !confirmChecked : false}>{yesLabel ? yesLabel : 'Done'}</Button>
-          }
+          : null }
+          <>
+          {onDone ?
+            <CustomButton status='primary' onPress={onDone} style={styles.doneButton} disabled={confirmLabel ? !confirmChecked : false}>{yesLabel ? yesLabel : 'Done'}</CustomButton>
+          : null }
+          </>
         </View>
     </Modal>
+    </Portal>
   );
 }
 
-const themedStyles = StyleService.create({
+const styles = StyleSheet.create({
+  containerStyle: {
+    backgroundColor: 'white',
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
   backdrop: {
     backgroundColor: 'rgba(0, 0, 0, 0.2)',
   },
@@ -67,7 +88,7 @@ const themedStyles = StyleService.create({
     alignItems: 'center',
 
     borderWidth: 0.5,
-    borderColor: 'color-primary-600',
+    borderColor: colors.color_primary_600,
     borderRadius: 12,
     backgroundColor: '#FFFFFF',
     width: '90%',
@@ -79,14 +100,16 @@ const themedStyles = StyleService.create({
     marginTop: 41.08,
   },
   header: {
-    marginTop: 19.08,
+    marginTop: 18,
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   bodyText: {
     marginTop: 24,
     marginHorizontal: 30,
   },
   buttonContainer:{
-    flex: 1,
+    // flex: 1,
     justifyContent: 'center',
     flexDirection: 'row',
 
@@ -108,10 +131,31 @@ const themedStyles = StyleService.create({
   doneButton: {
     // height: 48,
 
-    backgroundColor: 'color-primary-600',
+    backgroundColor: colors.color_primary_600,
     borderRadius: 24,
     borderWidth: 0,
     minWidth: 100,
     // color: '#121212',
   },
 });
+
+/*
+{
+  "error": {
+    "code": 200,
+    "data": {
+      "arguments": [Array],
+      "context": [Object],
+      "debug": "Traceback (most recent call last):
+  File \"/home/obayit/src/vs/odoo16/odoo/modules/registry.py\", line 64, in __new__
+  ...
+psycopg2.OperationalError: connection to server on socket \"/var/run/postgresql/.s.PGSQL.5432\" failed: FATAL:  database \"v16general\" does not exist",
+      "message": "connection to server on socket \"/var/run/postgresql/.s.PGSQL.5432\" failed: FATAL:  database \"v16general\" does not exist",
+      "name": "psycopg2.OperationalError"
+    },
+    "message": "Odoo Server Error"
+  },
+  "id": null,
+  "jsonrpc": "2.0"
+}
+*/
