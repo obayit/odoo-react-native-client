@@ -5,7 +5,7 @@ import { ReusableStyles, FeatureContainer, Loading } from '../../components';
 
 import { useDispatch } from 'react-redux';
 import { logOut } from '../../common/store/authSlice';
-import { useProductsQuery, useUpdateCartMutation } from '../../common/store/reduxApi';
+import { injectQuery, odooApi, useProductsQuery, useUpdateCartMutation } from '../../common/store/reduxApi';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { displayM2O } from '../../common/utils/parseData';
 import { useNavigation } from '@react-navigation/native'
@@ -42,7 +42,12 @@ const ProductItem = ({ item: product }) => {
 export default ({ navigation }) => {
     const dispatch = useDispatch();
 
-    const { data, isLoading } = useProductsQuery();
+    const query = injectQuery('product.product').useQuery({
+      kwargs: {
+        fields: ['id', 'name', 'list_price', 'currency_id'],
+      }
+    })
+    const { data, isLoading } = query;
 
     const styles = ReusableStyles
 
@@ -52,12 +57,21 @@ export default ({ navigation }) => {
         // setSavedLoginInfo();  // FIXME: activate this later
     }, []);
 
+    async function tmpRefresh(){
+      const res = await query.refetch().unwrap()
+      console.log('#res');
+      console.log(res);
+    }
+
     return (
         <FeatureContainer>
             <View style={styles.listContainer}>
                 <Loading isLoading={isLoading} />
+                <CustomButton onPress={tmpRefresh}>refresh</CustomButton>
 
                 <FlatList
+                  refreshing={isLoading}
+                  onRefresh={query.refetch}
                     style={styles.list}
                     data={data?.records}
                     renderItem={props => <ProductItem {...props}/>}

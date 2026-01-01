@@ -13,7 +13,7 @@ import { getPassword, getUsername, savePassword, saveUsername } from '../../nati
 import * as LocalAuthentication from 'expo-local-authentication';
 import { useLoginMutation } from '../../common/store/reduxApi';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectAuth, selectConfiguration, setAuth, setConfiguration } from '../../common/store/authSlice';
+import { selectAuth, selectConfiguration, setAuth, updateConfiguration } from '../../common/store/authSlice';
 import DebugView from '../../components/DebugView';
 import { CustomButton } from '../../components/CustomButtons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -130,14 +130,14 @@ export default ({ navigation }) => {
 
   const updateUrl = (value) => {
     if (value !== undefined) {
-      dispatch(setConfiguration({
+      dispatch(updateConfiguration({
         'baseUrl': value,
       }))
     }
   }
   const updateDatabase = (value) => {
     if (value !== undefined) {
-      dispatch(setConfiguration({
+      dispatch(updateConfiguration({
         'database': value,
       }))
     }
@@ -196,7 +196,7 @@ export default ({ navigation }) => {
             }} />
 
         </FormProvider>
-        {/* <DebugView /> */}
+        <DebugView />
         <CustomButton disabled={isLoading} onPress={handleSubmit(onSignInButtonPress)} style={styles.submitButton} icon='login'>Login</CustomButton>
         {/* <CustomButton status='control' onPress={testAddError} style={styles.submitButton}>Test Error Modal</CustomButton>
         <CustomButton status='control' onPress={() => errorApi.addError('hi', { type: 'info' })} style={styles.submitButton}>Test Info Modal</CustomButton>

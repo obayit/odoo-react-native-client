@@ -14,7 +14,7 @@ const HorizontalItem = ({children}) => {
 export default ({ recordIds, orderId }) => {
     const { useQuery } = injectQuery('sale.order.line')
     const { data, isLoading, refetch } = useQuery({
-        args: {
+        kwargs: {
             fields: [
                 'id',
                 'product_id',
