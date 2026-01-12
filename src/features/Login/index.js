@@ -13,12 +13,13 @@ import { getPassword, getUsername, savePassword, saveUsername } from '../../nati
 import * as LocalAuthentication from 'expo-local-authentication';
 import { useLoginMutation } from '../../common/store/reduxApi';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectAuth, selectConfiguration, setAuth, setConfiguration } from '../../common/store/authSlice';
+import { selectAuth, selectConfiguration, setAuth, setConfiguration, updateAuth, updateConfiguration } from '../../common/store/authSlice';
 import DebugView from '../../components/DebugView';
 import { CustomButton } from '../../components/CustomButtons';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { CustomSpacer } from '../../components/Utils';
 import { SettingsIcon } from '../../components/icons';
+import colors from '../../components/colors';
 
 export const PersonIcon = (style) => (
   <MaterialCommunityIcons {...style} name='person' />
@@ -66,7 +67,7 @@ export default ({ navigation }) => {
       login = login.trim();
       // NOTE: unwraps either returns the success response, or throws an error
       let auth = await loginMethod({ login, password, db: data.database }).unwrap();  // use .unwrap() here?
-      dispatch(setAuth({ ...auth }))
+      dispatch(updateAuth({ ...auth }))
       const response = {};
       if (response) {  // response is uid
         if (rememberMe) {
@@ -130,14 +131,14 @@ export default ({ navigation }) => {
 
   const updateUrl = (value) => {
     if (value !== undefined) {
-      dispatch(setConfiguration({
+      dispatch(updateConfiguration({
         'baseUrl': value,
       }))
     }
   }
   const updateDatabase = (value) => {
     if (value !== undefined) {
-      dispatch(setConfiguration({
+      dispatch(updateConfiguration({
         'database': value,
       }))
     }
@@ -196,7 +197,7 @@ export default ({ navigation }) => {
             }} />
 
         </FormProvider>
-        {/* <DebugView /> */}
+        <DebugView />
         <CustomButton disabled={isLoading} onPress={handleSubmit(onSignInButtonPress)} style={styles.submitButton} icon='login'>Login</CustomButton>
         {/* <CustomButton status='control' onPress={testAddError} style={styles.submitButton}>Test Error Modal</CustomButton>
         <CustomButton status='control' onPress={() => errorApi.addError('hi', { type: 'info' })} style={styles.submitButton}>Test Info Modal</CustomButton>
@@ -224,6 +225,7 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     marginTop: 10,
+    backgroundColor: colors.color_info_300,
   },
   scrollContainer: {
     margin: 16,

@@ -2,8 +2,8 @@ import { createSlice } from "@reduxjs/toolkit"
 import { Platform } from "react-native"
 
 const initialState = { uid: null }
-const defaultDb = 'v16pos'
-const defaultUrl = 'http://192.168.1.2:8069'
+const defaultDb = 'v17dash'
+const defaultUrl = 'http://192.168.1.101:8017'
 
 const initialConfigurationState = {
   baseUrl: process.env.EXPO_PUBLIC_ODOO_URL ?? defaultUrl,
@@ -21,6 +21,7 @@ const authSlice = createSlice({
   initialState: initialState,
   reducers: {
     setAuth: (state, action) => action.payload,
+    updateAuth: (state, action) => {return {...state, ...action.payload } },
     logOut: () => initialState,
   },
 })
@@ -30,6 +31,7 @@ const configurationSlice = createSlice({
   initialState: Platform.OS == 'web' ? initialConfigurationStateWeb : initialConfigurationState,
   reducers: {
     setConfiguration: (state, action) => action.payload,
+    updateConfiguration: (state, action) => {return {...state, ...action.payload } },
   },
 })
 
@@ -49,8 +51,8 @@ const errorsSlice = createSlice({
   },
 })
 
-export const { setAuth, logOut } = authSlice.actions
-export const { setConfiguration } = configurationSlice.actions
+export const { setAuth, updateAuth, logOut } = authSlice.actions
+export const { setConfiguration, updateConfiguration } = configurationSlice.actions
 export const { setErrors, addError, clearErrors, flagShown } = errorsSlice.actions
 
 export default authSlice.reducer

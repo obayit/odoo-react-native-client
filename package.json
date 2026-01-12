@@ -19,6 +19,8 @@
     "@types/react-native": "~0.73.0",
     "expo": "^54.0.30",
     "expo-application": "^7.0.8",
+    "expo-clipboard": "~8.0.8",
+    "expo-image": "~3.0.11",
     "expo-local-authentication": "~17.0.8",
     "expo-secure-store": "^15.0.8",
     "expo-splash-screen": "~31.0.13",

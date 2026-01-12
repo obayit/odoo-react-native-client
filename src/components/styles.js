@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import colors from './colors';
 
 export const ReusableStyles = StyleSheet.create({
   // put all common/reusable styles here
@@ -59,5 +60,11 @@ export const ReusableStyles = StyleSheet.create({
 
   textTopRight: {
     marginRight: 2,
+  },
+  textDebug: {
+    color: colors.color_danger_600,
+    borderColor: colors.color_danger_600,
+    borderWidth: 1,
+    borderStyle: 'dashed',
   },
 });

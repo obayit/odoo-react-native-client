@@ -1,6 +1,6 @@
 import { actions } from '../providers/APIErrorProvider';
 
-export function isResponseOk(response) {
+export async function isResponseOkAsync(response, args, api, extraOptions) {
     let error_result = {
         ok: false
     }

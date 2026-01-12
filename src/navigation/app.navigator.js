@@ -16,9 +16,15 @@ import OrdersList from '../features/OrdersList';
 import HomeScreen from '../features/HomeScreen';
 import colors from '../components/colors';
 import { StyleSheet } from 'react-native';
+import ProductDetailsScreen from '../features/ProductDetailsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
+
+export const ScreenNames = {
+  Products: 'Products',
+  ProductDetails: 'ProductDetails',
+}
 
 const useHeaderOptions = () => {
   return {
@@ -50,6 +56,9 @@ const HomeNavigator = () => {
     title: 'Products',
     tabBarIcon: (props) => tabBarIcon({name: 'shopping', ...props}),
   }
+  const productDetailsOptions = {
+    title: 'Product Details',
+  }
   const selectModelOptions = {
     title: 'Select a Model',
     tabBarIcon: (props) => tabBarIcon({name: 'file-search', ...props}),
@@ -66,9 +75,10 @@ const HomeNavigator = () => {
   }
   const HomeTabs = () =>
     <Tab.Navigator screenOptions={tabBarOptions}>
-      <Tab.Screen name='Menus' component={HomeScreen} options={homeOptions}/>
+      {/* <Tab.Screen name='Menus' component={HomeScreen} options={homeOptions}/> */}
+      <Tab.Screen name={ScreenNames.Products} component={Products} options={productsOptions}/>
+      <Tab.Screen name={ScreenNames.ProductDetails} component={ProductDetailsScreen} options={productDetailsOptions}/>
       <Tab.Screen name='My Orders' component={OrdersList} options={ordersOptions}/>
-      <Tab.Screen name='Our Products' component={Products} options={productsOptions}/>
       <Tab.Screen name='Select Model' component={SelectModel} options={selectModelOptions}/>
     </Tab.Navigator>
 
