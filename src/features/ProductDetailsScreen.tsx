@@ -14,22 +14,31 @@ import AmountText from '../components/AmountText';
 
 
 interface ProductConfigurationData {
-  variantId: Number;
-  combination: Array<Number>;
+  variantId: number;
+  combination: Array<AttrValuePair>;
   qty: Number;
 }
+
+type AttrValuePair = {
+  attribute_id: number
+  value_id: number
+}
+
 
 
 export default function ProductDetailsScreen({ navigation, route }) {
   const rs = ReusableStyles;
   const passedRecord = route.params?.record
   const recordId = passedRecord?.id ?? route.params.recordId
-  const [attrChecked, _setAttrChecked] = useState<AttrCheckedMap>({})
+  // const [attrChecked, _setAttrChecked] = useState<AttrValuePair[]>([])
   const [productConfig, setProductConfig] = useState<ProductConfigurationData>({
     variantId: 0,
     combination: [],
     qty: 1,
   })
+  const [combinationParams, setCombinationParams] = useState<any>({})
+  const [firstCombinationParams, setFirstCombinationParams] = useState<any>({})
+  const [debugText, setDebugText] = useState<any>({})
 
   const { record, query } = useSingleRecord({
     model: 'product.template',
@@ -66,59 +75,301 @@ export default function ProductDetailsScreen({ navigation, route }) {
       },
     },
   })
-  const [combinationQueryFn, combinationQuery] = odooApi.useLazyControllerQuery()
+  const { query: variantDebugQuery } = useSingleRecord({
+    model: 'product.product',
+    recordId: productConfig.variantId,
+    queryKwArgs: {
+      specification: {
+        id: {},
+        name: {},
+        product_template_variant_value_ids: {
+          fields: {
+            display_name: {}
+          }
+        }
+      }
+    }
+  })
+  // const [combinationQueryFn, combinationQuery] = odooApi.useLazyGetCombinationInfoQuery()
+  const combinationQueryFn = () => { throw 'unimplemented combinationQueryFn'}
+  const combinationQuery = odooApi.useGetCombinationInfoQuery({
+    combination: productConfig.combination,
+    params: {
+      "product_template_id": recordId,
+      "product_id": productConfig.variantId,
+      "combination": combinationStateToApi(productConfig.combination),
+      "add_qty": productConfig.qty,
+      "parent_combination": []  // ?what is this, combination of parent product when this product is an accessory?
+    },
+  }
+  // todo: add skip here, when combination or recordId are empty
+)
+  const [getFirstCombinationQueryFn, getFirstCombinationQuery] = odooApi.useLazyGetFirstCombinationQuery()
 
-  function getCombinationInfo({ combination }) {
-    combinationQueryFn({
-      url: '/website_sale/get_combination_info',
+  function _initialize_combination() {
+    getFirstCombinationAsync()
+    // getCombinationInfoAsync()
+  }
+
+  useEffect(() => {
+    if (record?.id) {
+      _initialize_combination()
+    }
+  }, [record?.id])
+
+  async function getCombinationInfoAsync({ combination = undefined, prevCombination=undefined, product_id = undefined, disable_this=true } = {}) {
+    if(disable_this||true){
+      return
+    }
+    console.log('#getCombinationInfoAsync()');
+    console.log(combination);
+    const combinationState = combination ?? productConfig.combination
+    const combinationApi = combinationStateToApi(combinationState)  // convert state format to api format
+    const combinationParams = {
+      combination: combinationState,
       params: {
         "product_template_id": recordId,
-        "product_id": productConfig.variantId,
-        "combination": combination ?? productConfig.combination,
+        "product_id": product_id ?? productConfig.variantId,
+        "combination": combinationApi,
         "add_qty": productConfig.qty,
         "parent_combination": []  // ?what is this
       },
-    })
+    }
+    setCombinationParams(combinationParams)
+    try {
+      // const hi = 'combinationParams = '+JSON.stringify(combinationParams);
+      const res = await combinationQueryFn(combinationParams).unwrap()
+      // console.log(`#newConfig hi = ${hi}`);
+      // const { carousel, product_tags, ...otherRes } = res
+      // console.log(otherRes);
+      let newVariantId = undefined
+      let newCombination = undefined
+      // console.log('#res __combinationQueryFn');
+      // console.log(res);
+      if (res.is_combination_possible) {
+        if(res.product_id){
+          newVariantId = res.product_id
+        }
+        newCombination = combinationState
+      } else {
+        console.log('#prevCombination');
+        console.log(prevCombination);
+        if(prevCombination){
+          newCombination = prevCombination
+        }
+      }
+      console.log('#newVariantId');
+      console.log(newVariantId);
+      console.log('#newCombination');
+      console.log(newCombination);
+      setProductConfig(prev => ({
+        ...prev,
+        variantId: newVariantId ?? prev.variantId,
+        combination: newCombination ?? prev.combination,
+      }))
+    } catch (error) {
+      console.log('#error');
+      console.log(error);
+    }
+  }
+
+  // useEffect(() => {
+  //   if(!combinationQuery.data) return
+  //   const res = combinationQuery.data
+  //   try {
+  //     let newVariantId = undefined
+  //     let newCombination = undefined
+  //     if (res.is_combination_possible) {
+  //       if(res.product_id){
+  //         newVariantId = res.product_id
+  //       }
+  //       newCombination = combinationState
+  //     } else {
+  //       console.log('#prevCombination');
+  //       console.log(prevCombination);
+  //       if(prevCombination){
+  //         newCombination = prevCombination
+  //       }
+  //     }
+  //     console.log('#newVariantId');
+  //     console.log(newVariantId);
+  //     console.log('#newCombination');
+  //     console.log(newCombination);
+  //     setProductConfig(prev => ({
+  //       ...prev,
+  //       variantId: newVariantId ?? prev.variantId,
+  //       combination: newCombination ?? prev.combination,
+  //     }))
+  //   } catch (error) {
+  //     console.log('#error');
+  //     console.log(error);
+  //   }
+  // }, [combinationQuery.data])
+  
+
+  async function getFirstCombinationAsync(/* maybe we should pass attributes here as the user inputs them? or this is only for the first time to initialize default combination? */) {
+    const combinationParams = {
+      model: 'product.template',
+      method: 'obi_app_get_first_possible_combination',  // implement_backend
+      // implementation:
+      /*
+        def obi_app_get_first_possible_combination(self, *args, **kwargs):
+            return self._get_first_possible_combination(*args, **kwargs).ids
+      */
+      args: [recordId],
+      kwargs: {
+        parent_combination: null,  // doc says: combination from which `self` is an optional or accessory product.
+        necessary_values: null,  // whenever the user choses an attribute we should call this again, right?
+      },
+    }
+    setFirstCombinationParams(combinationParams)
+    try {
+      const res = await getFirstCombinationQueryFn(combinationParams).unwrap()
+      if (res?.length) {
+        const newAttrCheckedState = combinationApiToState(record, res)
+        setProductConfig({
+          ...productConfig,
+          combination: newAttrCheckedState,
+        })
+        getCombinationInfoAsync({ combination: newAttrCheckedState, prevCombination: productConfig.combination })
+      }
+    } catch (error) {
+      console.log('#error');
+      console.log(error);
+    }
   }
 
   useEffect(() => {
     if (combinationQuery.data) {
-      console.log(combinationQuery.data)
+      // console.log(combinationQuery.data)
     }
   }, [combinationQuery.data])
 
 
   const { data, isLoading, refetch } = query
 
-  function setAttrChecked(attribute_id, value_id) {
-    const output = Object.entries(attrChecked)
-      .filter(([k, v]) => {
-        // first remove all(should be only one at most) keys that target the same attribute, since only one can be selected at a time
-        return !k.startsWith(`${attribute_id}.`); // some irrelevant conditions here
-      })
-      .reduce((accum, [k, v]) => {
-        accum[k] = v; // reduce returns other attribute/value as is
-        return accum;
-      }, {});
-    output[`${attribute_id}.${value_id}`] = true // assign true to the current selected attribute/value
-    _setAttrChecked(output)
+  function getOrderedAttributeValues(pairs: AttrValuePair[]){
+    const res = record.attribute_line_ids.map(item => pairs.find(p => p.attribute_id === item.attribute_id.id)?.value_id)
+    console.log('#pairs');
+    console.log(pairs);
+    console.log('#res @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@');
+    console.log(res);
+    record.attribute_line_ids.map(item => pairs.find(p => {
+      console.log(`${p.attribute_id} === ${JSON.stringify(item.attribute_id.id)}`)
+    }))
+    if(res.some(item => !item)){
+      console.log('some attributes are not set, we are not returning ordered attributes array');
+      return []
+    }
+    return res
+  }
 
-    const newCombination = Object.keys(output).map(key => Number(key.split('.')[1]))
+  function setAttrCheckedBulk(pairs: AttrValuePair[]) {
+    const output: AttrValuePair[] = []
+
+    for (const { attribute_id, value_id } of pairs) {
+      output.push({
+        attribute_id,
+        value_id,
+      })
+    }
+
+    var newAttrCheckedState = []  // note: this value will be set to a useState, so, don't change it after it is set there with _setAttrChecked
+
+    setProductConfig(prev => {
+      // const excludePrevKeys = []
+      // Object.keys(prev).map(prevKey => {
+      //   const dotIndex = (prevKey+'').indexOf('.')
+      //   if(dotIndex > -1){
+      //     const attributeId = (prevKey + '').substring(0, dotIndex)
+      //     excludePrevKeys.push(Object.keys(prev).filter(item => (item+'').startsWith(`${attributeId}.`)))
+      //     console.log('#excludePrevKeys');
+      //     console.log(excludePrevKeys + '');
+      //   }
+      // })
+      console.log('#prev');
+      console.log(JSON.stringify(prev));
+      console.log('#output');
+      console.log(JSON.stringify(output));
+      console.log('#removeDuplicateAttributes(output, prev.combination)  @@@');
+      console.log(removeDuplicateAttributes(output, prev.combination));
+      // merge two arrays and remove duplicates
+      newAttrCheckedState = [
+        ...output,
+        ...removeDuplicateAttributes(output, prev.combination),
+      ]
+      return {
+        ...prev,
+        combination: newAttrCheckedState,
+      }
+    })
+    if(newAttrCheckedState?.length && newAttrCheckedState?.length === record?.attribute_line_ids?.length){
+      getCombinationInfoAsync({ combination: newAttrCheckedState })
+    }
+    // _setAttrChecked(output)
+    // _setAttrChecked(output)
+
+    /*
+    const newCombination = getOrderedAttributeValuek(newAttrCheckedState)
+    // const newCombination = pairs.map(p => p.value_id)
+
     setProductConfig({
       ...productConfig,
       combination: newCombination,
     })
 
-    const allAttributesAreSet = newCombination.length === record?.attribute_line_ids?.length
-    console.log('#allAttributesAreSet');
-    console.log(allAttributesAreSet);
-    console.log('#newCombination.length === record?.attribute_line_ids?.length');
-    console.log(`${newCombination.length} === ${record?.attribute_line_ids?.length}`);
+    const allAttributesAreSet =
+      newCombination.length === record?.attribute_line_ids?.length
+
     if (allAttributesAreSet) {
-      getCombinationInfo({ combination: newCombination })
+      getCombinationInfoAsync({ combination: newCombination })
     }
+      */
   }
 
+  /*
+  useEffect(() => {
+    console.log('#useEffect, combination');
+    const attrChecked = productConfig.combination
+    console.log(attrChecked?.length);
+    if(attrChecked?.length){
+      if(attrChecked?.length === record?.attribute_line_ids?.length){
+        // todo: is it possible that backend have an attribute with no possible value? probably backend prevents this, and we here too won't try to getCombinationInfo unless all attributes have values
+        // const newCombination = getOrderedAttributeValues(attrChecked)
+        // console.log('#newCombination');
+        // console.log(newCombination);
+        // console.log('#!attrsEqual(productConfig.combination, newCombination)');
+        // console.log(!attrsEqual(productConfig.combination, newCombination));
+        if(!attrsEqual(productConfig.combination, attrChecked) ||true){
+          console.log('#SETTING NEW PRODUCT CONFIG');
+      // single source of truth is productConfig, no longer need to update it here
+      // console.log('#setProductConfig #3');
+      // console.log({
+      //       ...productConfig,
+      //       combination: newCombination,
+      //   });
+      //     setProductConfig({
+      //       ...productConfig,
+      //       combination: newCombination,
+      //     })
+          getCombinationInfoAsync({ combination: attrChecked })
+        }
+      }
+    }
+  }, [productConfig.combination])
+  */
+  
+
+  function isAttributeChecked(attribute_id, value_id) {
+    // const attrChecked = productConfig.combination
+    const attrChecked = combinationQuery.data?._combination
+    if(!attrChecked?.find){
+      console.log('#attrChecked ____________________________________');
+      console.log(attrChecked);
+      return
+    }
+    return Boolean(attrChecked.find(item => item.attribute_id === attribute_id && item.value_id === value_id))
+  }
 
   useEffect(() => {
     // setSavedLoginInfo();  // FIXME: activate this later
@@ -138,6 +389,7 @@ export default function ProductDetailsScreen({ navigation, route }) {
   */
   function getImageUrlQueryData() {
     // /web/image/product.product/12/image_1024/%5BFURN_0096%5D%20Customizable%20Desk%20%28Steel%2C%20White%29?unique=75a43b4
+    const attrChecked = productConfig.combination
     if (attrChecked) {
       record.attribute_line_ids?.map(item => {
 
@@ -152,11 +404,19 @@ export default function ProductDetailsScreen({ navigation, route }) {
       <ScrollView>
         <AddToCart record={record} />
         <CustomButton onPress={query.refetch}>reload</CustomButton>
-        <CustomButton onPress={getCombinationInfo}>getCombination info</CustomButton>
-        <Text>productConfig: {JSON.stringify(productConfig, null, 2)}</Text>
-        {/* <Text>combination: {JSON.stringify(combinationQuery.data, null, 2)}</Text> */}
+        <CustomButton onPress={getCombinationInfoAsync}>getCombination info</CustomButton>
+        <View style={{flexDirection: 'row'}}>
+          <Text style={styles.debugSubtleText}>productConfig: {JSON.stringify(productConfig, null, 2)}{'\n'}{JSON.stringify(variantDebugQuery.data)}</Text>
+          {/* <Text style={styles.debugSubtleText}>attrChecked: {JSON.stringify(attrChecked, null, 2)}</Text> */}
+          <Text style={styles.debugSubtleText}>combination: {JSON.stringify(stripHtmlDebug(combinationQuery.data), null, 2)}</Text>
+          {combinationQuery.error?<Text style={styles.debugSubtleText}>combinationError: {JSON.stringify(combinationQuery.error, null, 2)}</Text>:null}
+          <Text style={styles.debugSubtleText}>firstCombination: {JSON.stringify(getFirstCombinationQuery.data, null, 2)}</Text>
+        </View>
+        {/* <Text style={styles.debugSubtleText}>combinationParams: {JSON.stringify(combinationParams, null, 2)}</Text> */}
+        {/* <Text style={styles.debugSubtleText}>firstCombinationParams: {JSON.stringify(firstCombinationParams, null, 2)}</Text> */}
+        {/* <Text style={styles.debugSubtleText}>debugText: {JSON.stringify(debugText, null, 2)}</Text> */}
         {/* <Text>{JSON.stringify(record, null, 2)}</Text> */}
-        <Text>product_id:: {JSON.stringify(combinationQuery.data?.product_id)}</Text>
+        {/* <Text style={styles.debugSubtleText}>product_id:: {JSON.stringify(combinationQuery.data?.product_id)}</Text> */}
         <OdooImage
           model={combinationQuery.data?.product_id ? 'product.product' : 'product.template'}
           recordId={combinationQuery.data?.product_id ? combinationQuery.data?.product_id : record.id}
@@ -170,14 +430,15 @@ export default function ProductDetailsScreen({ navigation, route }) {
           <Text style={styles.attrNameText}>{attr.attribute_id?.display_name}</Text>
           {attr.value_ids?.map(attrValue => {
             function handleChange() {
-              setAttrChecked(attr.id, attrValue.id)
+              console.log('#setAttrCheckedBulk #1')
+              setAttrCheckedBulk([{attribute_id: attr.id, value_id: attrValue.id}])
             }
             return (<TouchableOpacity style={styles.attrContainer} key={attrValue.id} onPress={handleChange}>
               <RadioButton
                 value={`${attr.id}.${attrValue.id}`}
-                status={attrChecked[`${attr.id}.${attrValue.id}`] ? 'checked' : 'unchecked'} onPress={handleChange}
+                status={isAttributeChecked(attr.id, attrValue.id) ? 'checked' : 'unchecked'} onPress={handleChange}
               />
-              <CustomText>{attrValue.display_name}</CustomText>
+              <CustomText>{attrValue.display_name} #{`${attr.id}.${attrValue.id}`}</CustomText>
             </TouchableOpacity>)
           })}
         </View>)}
@@ -265,6 +526,12 @@ const styles = StyleSheet.create({
   },
   plusButtonText: {
     fontSize: 28,
+  },
+  debugSubtleText: {
+    paddingHorizontal: 5,
+    borderBottomWidth: 1,
+    borderLeftWidth: 1,
+    borderColor: 'black',
   },
 });
 
@@ -444,10 +711,6 @@ const og_web_read = {
   }
 }
 
-interface AttrCheckedMap {
-  [key: string]: boolean;  // key includes attribute_id and value_id
-}
-
 const example_response_for__get_combination_info = {
   "allow_out_of_stock_order": true,
   "available_threshold": 5,
@@ -492,4 +755,54 @@ const example_response_for__get_combination_info = {
   "stock_notification_email": "",
   "uom_name": "Units",
   "uom_rounding": 0.01
+}
+
+const arraysEqual = (a, b) =>
+  a.length === b.length && a.every((v, i) => v === b[i]);
+
+const attrsEqual = (a: AttrValuePair[], b: AttrValuePair[]) => {
+  console.log('#attrsEqual()');
+  console.log(a);
+  console.log(b);
+  const hasValuesAndSameLength = a.length && a.length === b.length
+   if(hasValuesAndSameLength){
+    return a.every((v, i) => v.value_id === b.find(b_item => b_item.attribute_id === v.attribute_id).value_id);
+   } else {
+    return false
+   }
+}
+
+const removeDuplicateAttributes = (newValue: AttrValuePair[], oldValue: AttrValuePair[]) =>{
+  console.log('#removeDuplicateAttributes()');
+  console.log('#oldValue');
+  console.log(oldValue);
+  console.log('#newValue');
+  console.log(newValue);
+  const res = oldValue.filter(old_item => !newValue.find(new_item => old_item.attribute_id === new_item.attribute_id))
+  console.log('#res');
+  console.log(res);
+  return res
+}
+
+const combinationApiToState = (record, combinationApi): AttrValuePair[] => {
+  console.log('#combinationApiToState()');
+  const hasValuesAndSameLength = (record?.attribute_line_ids?.length && record?.attribute_line_ids?.length === combinationApi?.length)
+  if(hasValuesAndSameLength){
+    const res = record.attribute_line_ids.map((attrObject, i) => ({attribute_id: attrObject.attribute_id.id, value_id: combinationApi[i]}))
+    console.log('#res ');
+    console.log(res );
+    return res
+  } else {
+    return []
+  } 
+}
+
+const combinationStateToApi = (state: AttrValuePair[]) => state?.length ? state.map(item => item.value_id) : []
+
+const stripHtmlDebug = data => {
+  if(data){
+    const { display_name, carousel, product_tags, ...otherRes } = data
+    return otherRes
+  }
+  return undefined
 }

@@ -243,6 +243,36 @@ export const odooApi = createApi({
         }
       }),
     }),
+    // Dedicated endpoints for website/product combination APIs so they have
+    // independent cache entries (instead of sharing the generic `controller` endpoint).
+    getCombinationInfo: builder.query({
+      query: (arg) => ({
+        url: '/website_sale/get_combination_info',
+        method: 'POST',
+        body: {
+          jsonrpc: "2.0",
+          method: "call",
+          params: arg.params,
+        }
+      }),
+      transformResponse: (response, meta, arg) => {
+        if(response?.is_combination_possible === true){
+          response._combination = arg.combination
+        }
+        return response
+      }
+    }),
+    getFirstCombination: builder.query({
+      query: (params) => ({
+        url: '/web/dataset/call_kw',
+        method: 'POST',
+        body: {
+          jsonrpc: "2.0",
+          method: "call",
+          params,
+        }
+      }),
+    }),
   }),
 });
 

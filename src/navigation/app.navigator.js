@@ -17,14 +17,11 @@ import HomeScreen from '../features/HomeScreen';
 import colors from '../components/colors';
 import { StyleSheet } from 'react-native';
 import ProductDetailsScreen from '../features/ProductDetailsScreen';
+import { ScreenNames } from './navigation.constants';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
 
-export const ScreenNames = {
-  Products: 'Products',
-  ProductDetails: 'ProductDetails',
-}
 
 const useHeaderOptions = () => {
   return {

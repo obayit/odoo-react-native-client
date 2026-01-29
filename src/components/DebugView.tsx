@@ -4,7 +4,7 @@ import { odooApi } from '../common/store/reduxApi'
 import { selectConfiguration } from '../common/store/authSlice'
 import { useNavigation } from '@react-navigation/native'
 import { useEffect } from 'react'
-import { ScreenNames } from '../navigation/app.navigator'
+import { ScreenNames } from '../navigation/navigation.constants'
 
 function DebugView() {
   const debugHook = useDebug()

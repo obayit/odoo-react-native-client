@@ -186,6 +186,9 @@ export default ({ navigation }) => {
               autoCapitalize: 'none',
               accessoryRight: PersonIcon,
               onSubmitEditing: () => passwordInput.current.focus(),
+              autoComplete: 'username',
+              textContentType: 'username',
+              autoCorrect: false,
             }} />
           {/* NOTE: see this to implement auto login on pressing enter, https://stackoverflow.com/a/35765465/3557761 */}
           <TextInput name='password' label='Password' {...commonInputProps}
@@ -194,6 +197,9 @@ export default ({ navigation }) => {
               accessoryRight: disablePasswordVisible ? null : (props) => renderPasswordIcon({ onPress: onPasswordIconPress, passwordVisible, ...props }),
               secureTextEntry: disablePasswordVisible || !passwordVisible,
               onSubmitEditing: handleSubmit(onSignInButtonPress),
+              autoComplete: 'password',
+              textContentType: 'password',
+              importantForAutofill: 'yes',
             }} />
 
         </FormProvider>
@@ -235,4 +241,3 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
 });
-

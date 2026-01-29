@@ -15,8 +15,8 @@ import { CustomButton } from '../../components/CustomButtons';
 import OdooImage from '../../components/OdooImage';
 import colors from '../../components/colors';
 import AmountText from '../../components/AmountText';
-import { ScreenNames } from '../../navigation/app.navigator';
 import DebugView from '../../components/DebugView';
+import { ScreenNames } from '../../navigation/navigation.constants';
 
 export const PersonIcon = (style) => (
     <MaterialCommunityIcons {...style} name='person' />
