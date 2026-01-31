@@ -47,8 +47,8 @@ export default ({ navigation }) => {
   const defaultValues = {
     base_url: configuration.baseUrl,
     database: configuration.database,
-    login: 'admin',
-    password: 'admin',
+    login: 'portal',
+    password: 'portal',
   }
   const resolver = useYupValidationResolver(yupSchema);
   const formMethods = useForm({ resolver, defaultValues });

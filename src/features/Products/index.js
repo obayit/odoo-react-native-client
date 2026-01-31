@@ -43,7 +43,6 @@ const ProductItem = ({ item: product }) => {
             <Text style={styles.title}>{product?.name}</Text>
             <AmountText amount={product?.list_price} currencyData={product.currency_id} />
             <CustomButton onPress={navigateToProductEdit} icon='cart'>Add to Cart</CustomButton>
-            <DebugView />
         </TouchableOpacity>
     );
 }

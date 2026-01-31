@@ -257,12 +257,24 @@ export const odooApi = createApi({
       }),
       transformResponse: (response, meta, arg) => {
         if(response?.is_combination_possible === true){
-          response._combination = arg.combination
+          response._combination = arg.combination  // not used for now, we use productConfig._combination
+          response._ptav = arg.params.combination  // not used for now, we use productConfig._combination
         }
         return response
       }
     }),
     getFirstCombination: builder.query({
+      query: (params) => ({
+        url: '/web/dataset/call_kw',
+        method: 'POST',
+        body: {
+          jsonrpc: "2.0",
+          method: "call",
+          params,
+        }
+      }),
+    }),
+    getAttributeExtraPrice: builder.query({
       query: (params) => ({
         url: '/web/dataset/call_kw',
         method: 'POST',

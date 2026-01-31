@@ -12,7 +12,15 @@ function DebugView() {
   const navigation = useNavigation()
   useEffect(() => {
     setTimeout(() => {
-      // navigation.navigate(ScreenNames.ProductDetails, { recordId: 9 });
+      const testProduct =
+      // 9 // customizable desk
+      // 16 // conference chair
+      // 37 // corne keyboard
+      0
+      ;
+      if(testProduct){
+        navigation.navigate(ScreenNames.ProductDetails, { recordId: testProduct });
+      }
     }, 500);
   }, [])
   return (
