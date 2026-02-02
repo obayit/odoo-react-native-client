@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Text, FlatList, View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { Text, FlatList, View, StyleSheet, ScrollView, TouchableOpacity, ViewStyle } from 'react-native';
 
 import { FeatureContainer, ReusableStyles } from '../components';
 import { injectQuery, odooApi } from '../common/store/reduxApi';
 import useSingleRecord from '../common/hooks/useSingleRecord';
 import { CustomButton } from '../components/CustomButtons';
 import colors from '../components/colors';
-import { Button, Checkbox, RadioButton, TextInput } from 'react-native-paper';
+import { Button, Checkbox, Chip, Divider, Icon, Menu, RadioButton, Surface, TextInput, TouchableRipple, useTheme } from 'react-native-paper';
 import CustomText from '../components/CustomText';
 import OdooImage from '../components/OdooImage';
 import DebugView from '../components/DebugView';
 import AmountText from '../components/AmountText';
-import { Dropdown, Option as DropDownOption } from 'react-native-paper-dropdown';
+import { Dropdown, DropdownItemProps, Option as DropDownOption } from 'react-native-paper-dropdown';
 
 
 interface ProductConfigurationData {
@@ -39,7 +39,7 @@ export default function ProductDetailsScreen({ navigation, route }) {
     _combination: [],
     qty: 1,
   })
-  const [combinationParams, setCombinationParams] = useState<any>({})
+  // const [combinationParams, setCombinationParams] = useState<any>({})
   const [firstCombinationParams, setFirstCombinationParams] = useState<any>({})
   const [debugText, setDebugText] = useState<any>({})
 
@@ -88,16 +88,17 @@ export default function ProductDetailsScreen({ navigation, route }) {
   })
   // const [combinationQueryFn, combinationQuery] = odooApi.useLazyGetCombinationInfoQuery()
   const combinationQueryFn = () => { throw 'unimplemented combinationQueryFn' }
+  const combinationParams = {
+    "product_template_id": recordId,
+    "product_id": productConfig.variantId,
+    // "combination": combinationStateToApi(productConfig.combination),
+    "combination": productConfig._combination,
+    "add_qty": productConfig.qty,
+    "parent_combination": []  // ?what is this, combination of parent product when this product is an accessory?
+  }
   const combinationQuery = odooApi.useGetCombinationInfoQuery({
     combination: productConfig._combination,
-    params: {
-      "product_template_id": recordId,
-      "product_id": productConfig.variantId,
-      // "combination": combinationStateToApi(productConfig.combination),
-      "combination": productConfig._combination,
-      "add_qty": productConfig.qty,
-      "parent_combination": []  // ?what is this, combination of parent product when this product is an accessory?
-    },
+    params: combinationParams,
   }
     // todo: add skip here, when combination or recordId are empty
   )
@@ -108,15 +109,30 @@ export default function ProductDetailsScreen({ navigation, route }) {
     // implementation:
     /*
     def obi_app_get_extra_price(self, combination_info):
-        return [
-            {"id": r.id, "extra_price": r._get_extra_price(combination_info)}
-            for r in self
-        ]
+      product_template_id = combination_params['product_template_id']
+      product_id = combination_params['product_id']
+      combination = combination_params['combination']
+      add_qty = combination_params['add_qty']
+      parent_combination = combination_params.get('parent_combination')
+
+      product_template = self.env['product.template'].browse(product_template_id and int(product_template_id))
+
+      combination_info = product_template._get_combination_info(
+        combination=self.env['product.template.attribute.value'].browse(combination),
+        product_id=product_id and int(product_id),
+        add_qty=add_qty and float(add_qty) or 1.0,
+        parent_combination=self.env['product.template.attribute.value'].browse(parent_combination),
+      )
+      return [
+        {"id": r.id, "extra_price": r._get_extra_price(combination_info)}
+        for r in self
+      ]
     */
     args: [all_ptav?.map(item => item.id)],
     kwargs: {
       // todo: find the correct combination_info, try to raise exception in the template to find out when it is being called, because i assume it is being initialized just like report data, somewhere just before rendering the template, they preprar the data and pass it there
-      combination_info: combinationQuery.data,
+      // combination_info: combinationQuery.data,
+      combination_params: combinationParams,
     },
   }, {
     skip: !all_ptav?.length
@@ -246,7 +262,7 @@ export default function ProductDetailsScreen({ navigation, route }) {
     try {
       const res = await getFirstCombinationQueryFn(combinationParams).unwrap()
       if (res?.length) {
-        const newAttrCheckedState = combinationApiToState(record, res)
+        // const newAttrCheckedState = combinationApiToState(record, res)
         setProductConfig({
           ...productConfig,
           // combination: newAttrCheckedState,
@@ -358,7 +374,7 @@ export default function ProductDetailsScreen({ navigation, route }) {
           {/* <Text style={styles.debugSubtleText}>attrChecked: {JSON.stringify(attrChecked, null, 2)}</Text> */}
           {/* <Text style={styles.debugSubtleText}>combination: {JSON.stringify(stripHtmlDebug(combinationQuery.data), null, 2)}</Text> */}
           {/* <Text style={styles.debugSubtleText}>product_id: {combinationQuery.data?.product_id}</Text> */}
-          {/* <Text style={styles.debugSubtleText}>extraPriceQuery: {JSON.stringify(extraPriceQuery.data, null, 2)}</Text> */}
+          {/* <Text style={styles.debugSubtleText}>extraPriceQuery: {JSON.stringify(extraPriceQuery.data, null, null)}</Text> */}
 
           {/* {combinationQuery.error ? <Text style={styles.debugSubtleText}>combinationError: {JSON.stringify(combinationQuery.error, null, 2)}</Text> : null} */}
           {/* <Text style={styles.debugSubtleText}>firstCombination: {JSON.stringify(getFirstCombinationQuery.data, null, 2)}</Text> */}
@@ -391,7 +407,7 @@ export default function ProductDetailsScreen({ navigation, route }) {
           <AmountText amount={combinationQuery.data?.price_extra} currencyData={record.currency_id} />
         </>
           : null}
-        <ProductTemplateAttributes record={record} productConfig={productConfig} setProductConfig={setProductConfig} combinationQuery={combinationQuery} />
+        <ProductTemplateAttributes record={record} productConfig={productConfig} setProductConfig={setProductConfig} combinationQuery={combinationQuery} extraPriceQuery={extraPriceQuery} />
         <AddToCart record={record} />
         {/* <DebugView/> headersMap*/}
       </ScrollView>
@@ -399,13 +415,13 @@ export default function ProductDetailsScreen({ navigation, route }) {
   );
 };
 
-function ProductTemplateAttributes({ record, productConfig, setProductConfig, combinationQuery }) {
+function ProductTemplateAttributes({ record, productConfig, setProductConfig, combinationQuery, extraPriceQuery }) {
   const all_ptal = record.valid_product_template_attribute_line_ids ?? []
   const all_ptav = all_ptal?.flatMap(item => item.product_template_value_ids) ?? []
   function setAttrCheckedBulk(ptal, pairs: AttrValuePair[]) {
     // this was originally needed to accept bulk edits, but now it is not needed
     // if after finishing this component we found there is no need for bulk edits, we can simplify the code to accept only a single pair of AttrValuePair
-    const isSingleValue = ['radio'].includes(ptal.attribute_id.display_type)
+    const isSingleValue = ['radio', 'color', 'pills'].includes(ptal.attribute_id.display_type)
     const uncheckable = ['multi'].includes(ptal.attribute_id.display_type)  // user can clicks to remove the item instead of adding it
     const output: AttrValuePair[] = []
     const output_array: number[] = []
@@ -483,11 +499,12 @@ function ProductTemplateAttributes({ record, productConfig, setProductConfig, co
     <>
       {all_ptal?.map(ptal => {
         // display_type can be: radio, pills, select, color, multi
-        const isRadio = ['radio', 'pills'].includes(ptal.attribute_id.display_type)
-        const isSingleValue = ['radio'].includes(ptal.attribute_id.display_type)
+        const isRadio = ['radio', 'color'].includes(ptal.attribute_id.display_type)
         const isCheckbox = ptal.attribute_id.display_type === 'multi'
         const isDropdown = ptal.attribute_id.display_type === 'select'
-        const dropDownOptions: DropDownOption[] = ptal.product_template_value_ids.map(ptav => ({ label: ptav.name, value: ptav.id + '' }))
+        const isColor = ptal.attribute_id.display_type === 'color'
+        const isPills = ptal.attribute_id.display_type === 'pills'
+        const dropDownOptions: DropDownOptionWithData[] = ptal.product_template_value_ids.map(ptav => ({ label: ptav.name, value: ptav.id + '', data: ptav }))
         const dropDownValue = productConfig._combination.find(item => ptal.product_template_value_ids.map(ptav => ptav.id).includes(item)) + ''
         const setDropdown = value => {
           const ptav = ptal.product_template_value_ids.find(ptav => ptav.id + '' === value)
@@ -495,8 +512,9 @@ function ProductTemplateAttributes({ record, productConfig, setProductConfig, co
             setAttrCheckedBulk(ptal, [{ attribute_id: ptal.attribute_id.id, value_id: ptav.id }])
           }
         }
+        const theme = useTheme();
         return (
-          <View key={ptal.id}>
+          <View key={ptal.id} style={styles.attributeContainer}>
             <Text style={styles.attrNameText}>{ptal.attribute_id?.display_name} ::{ptal.attribute_id?.display_type}</Text>
 
             {isDropdown ? <Dropdown
@@ -505,33 +523,171 @@ function ProductTemplateAttributes({ record, productConfig, setProductConfig, co
               options={dropDownOptions}
               value={dropDownValue}
               onSelect={setDropdown}
+              CustomDropdownInput={(props => {
+                const { placeholder, label, rightIcon, selectedLabel, mode, disabled, error } = props
+                return (
+                  <TextInput
+                    placeholder={placeholder}
+                    label={label}
+                    value={selectedLabel}
+                    right={rightIcon}
+                    mode={mode}
+                    editable={false}
+                    disabled={disabled}
+                    error={error}
+                    render={props => {
+                      const extraPrice = extraPriceQuery.data?.find(item => item.id + '' === dropDownValue)
+                      const hasExtraPrice = extraPrice?.id
+                      return (
+                        <View style={props.style}>
+                          <View style={styles.selectInputContainer}>
+                            <CustomText variant='bodyLarge'>{props.value}</CustomText>
+                            {hasExtraPrice ? <PriceExtraBadge extraPrice={extraPrice} size='small' /> : null}
+                          </View>
+                        </View>
+                      )
+                    }}
+                  />
+                )
+              })}
+              CustomDropdownItem={(props: DropdownItemProps) => {
+                const { option, width, value, onSelect, toggleMenu, isLast, menuItemTestID } =
+                  props;
+                const extraPrice = extraPriceQuery.data?.find(item => item.id + '' === option.value)
+                const hasExtraPrice = extraPrice?.id
+                const onPress = () => {
+                  if (option.value) {
+                    onSelect?.(option.value);
+                  }
+                  toggleMenu();
+                };
+                return (
+                  <TouchableRipple onPress={onPress} testID={menuItemTestID}>
+                    <>
+                      <View style={styles.selectionDropDownContainer}>
+                        <CustomText variant='bodyLarge'>{option.label}</CustomText>
+                        {hasExtraPrice ? <PriceExtraBadge extraPrice={extraPrice} /> : null}
+                      </View>
+                      {!isLast ? <Divider /> : null}
+                    </>
+                  </TouchableRipple>
+                )
+              }}
             /> : null}
 
-            {isRadio ? ptal.product_template_value_ids?.map(ptav => {
-              function handleChange() {
-                console.log('#setAttrCheckedBulk #1')
-                console.log(ptal);
-                setAttrCheckedBulk(ptal, [{ attribute_id: ptal.attribute_id.id, value_id: ptav.id }])
-              }
-              return (<TouchableOpacity style={styles.attrContainer} key={ptav.id} onPress={handleChange}>
-                {isRadio ?
-                  <RadioButton
-                    value={`${ptal.attribute_id.id}.${ptav.id}`}
-                    status={isAttributeChecked_array(ptav.id) ? 'checked' : 'unchecked'} onPress={handleChange}
-                  /> : null}
-                {isCheckbox ?
-                  <Checkbox
-                    status={isAttributeChecked_array(ptav.id) ? 'checked' : 'unchecked'} onPress={handleChange}
-                  /> : null}
-                <CustomText>{ptav.display_name} @{ptav.id}.{ptav.name}</CustomText>
-              </TouchableOpacity>)
-            }) : null}
+            <View style={isPills ? styles.attributeValuesContainerPills : styles.attributeValuesContainer}>
+              {(isRadio || isCheckbox || isPills) ? ptal.product_template_value_ids?.map(ptav => {
+                function handleChange() {
+                  console.log('#setAttrCheckedBulk #1')
+                  console.log(ptal);
+                  setAttrCheckedBulk(ptal, [{ attribute_id: ptal.attribute_id.id, value_id: ptav.id }])
+                }
+                const colorStyle = isColor ? {
+                  backgroundColor: ptav.is_custom ? '' : ptav.html_color || ptav.name,
+                } : undefined
+                const isSelected = isAttributeChecked_array(ptav.id)
+                const extraPrice = extraPriceQuery.data?.find(item => item.id === ptav.id)
+                const hasExtraPrice = extraPrice?.id
+                return (<TouchableOpacity style={styles.attrContainer} key={ptav.id} onPress={handleChange}>
+                  {isRadio ?
+                    <RadioButton
+                      value={`${ptal.attribute_id.id}.${ptav.id}`}
+                      status={isSelected ? 'checked' : 'unchecked'} onPress={handleChange}
+                    /> : null}
+                  {isCheckbox ?
+                    <Checkbox
+                      status={isSelected ? 'checked' : 'unchecked'} onPress={handleChange}
+                    /> : null}
+                  {isPills ?
+                    <Chip style={[styles.attributePill, isSelected ? { backgroundColor: theme.colors.primary } : undefined]} selected={isSelected} onPress={handleChange}
+                      showSelectedCheck={false}
+                      selectedColor={isSelected ? theme.colors.onPrimary : theme.colors.primary}
+                    >
+                      {
+                        hasExtraPrice ?
+                          <View style={styles.chipInnerContainer}>
+                            <CustomText variant='labelLarge' style={{ color: isSelected ? theme.colors.onPrimary : theme.colors.primary }}>{ptav.name}</CustomText>
+                            {hasExtraPrice ? <PriceExtraBadge extraPrice={extraPrice} size='small' /> : null}
+                          </View>
+                          :
+                          ptav.name
+                      }
+                    </Chip>
+                    : null}
+                  {isColor ? <View style={[styles.colorView, colorStyle]} /> : null}
+                  {isPills ? null :
+                    <View style={{ flexDirection: 'row', alignItems: 'center' } as ViewStyle}>
+                      <CustomText>{ptav.display_name} @{ptav.id}.{ptav.name}</CustomText>
+                      {hasExtraPrice ? <PriceExtraBadge extraPrice={extraPrice} /> : null}
+                    </View>
+                  }
+                </TouchableOpacity>)
+              }) : null}
+            </View>
           </View>
         )
       })}
     </>
   )
 }
+
+const PriceExtraBadge = ({ extraPrice, size = 'medium' }) => {
+  const amount = extraPrice?.extra_price
+  const currencySymbol = extraPrice?.currency_symbol ?? '$'
+  // If priceExtra is null, undefined, or 0, don’t render the badge
+  if (!amount) return null;
+
+  const sign = amount > 0 ? '+' : '-';
+  const absolutePrice = Math.abs(amount);
+  const theme = useTheme()
+
+  return (
+    <Surface style={[styles2.badge, { backgroundColor: theme.colors.secondaryContainer }, size === 'small' ? styles2.smallerBadge : null]} >
+      <View style={styles2.signCircle}>
+        <Icon source={sign === '+' ? 'plus' : 'minus'} size={10} color={theme.colors.primary} />
+      </View>
+      <CustomText style={styles2.price} variant='labelSmall'>
+        {currencySymbol} {absolutePrice.toFixed(2)}
+      </CustomText>
+    </Surface>
+  );
+};
+
+const styles2 = StyleSheet.create({
+  // yes AI helped me to make this style from a html code
+  badge: {
+    marginHorizontal: 8,
+    flexDirection: 'row',
+    borderRadius: 999, // rounded-pill equivalent
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc', // light border
+  },
+  smallerBadge: {
+    paddingVertical: 1,
+    paddingHorizontal: 4,
+  },
+  sign: {
+    fontWeight: 'bold',
+  },
+  price: {
+    color: '#6c757d', // text-muted equivalent
+    fontStyle: 'italic', // fst-italic equivalent
+  },
+  signCircle: {
+    backgroundColor: 'white', // circle background
+    width: 12, // circle width
+    height: 12, // circle height
+    borderRadius: 6, // make it a circle
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 4,
+  },
+
+});
+
 
 function AddToCart({ record }) {
   const [qty, setQty] = useState(1)
@@ -616,6 +772,41 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderLeftWidth: 1,
     borderColor: 'black',
+  },
+  attributeContainer: {
+    borderBottomColor: 'black',
+    borderBottomWidth: 1,
+  },
+  attributeValuesContainer: {
+    flexDirection: 'column',
+  },
+  attributeValuesContainerPills: {
+    flexDirection: 'row',
+  },
+  attributePill: {
+    marginHorizontal: 4,
+  },
+  chipInnerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  colorView: {
+    marginHorizontal: 16,
+    width: 40,
+    height: 20,
+    borderRadius: 8,
+  },
+  extraPricePill: {
+    borderRadius: 24,
+  },
+  selectionDropDownContainer: {
+    flexDirection: 'row',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+  },
+  selectInputContainer: {
+    flexDirection: 'row',
+    marginTop: 2,
   },
 });
 
@@ -900,6 +1091,7 @@ const attr_line_specs = {
       "fields": {
         "display_name": {},
         display_type: {},
+        // visibility: {},
       }
     },
     "value_ids": {
@@ -916,6 +1108,7 @@ const attr_line_specs = {
         id: {},
         name: {},
         is_custom: {},
+        html_color: {},
         attribute_id: {
           fields: {
             id: {},
@@ -928,3 +1121,7 @@ const attr_line_specs = {
   "limit": 40,
   "order": "sequence ASC, id ASC"
 }
+
+export type DropDownOptionWithData = DropDownOption & {
+  data: any,
+};
