@@ -6,7 +6,7 @@ import { injectQuery, odooApi } from '../common/store/reduxApi';
 import useSingleRecord from '../common/hooks/useSingleRecord';
 import { CustomButton } from '../components/CustomButtons';
 import colors from '../components/colors';
-import { Button, Checkbox, Chip, Divider, Icon, Menu, RadioButton, Surface, TextInput, TouchableRipple, useTheme } from 'react-native-paper';
+import { SegmentedButtons, Button, Checkbox, Chip, Divider, Icon, Menu, RadioButton, Surface, TextInput, TouchableRipple, useTheme } from 'react-native-paper';
 import CustomText from '../components/CustomText';
 import OdooImage from '../components/OdooImage';
 import DebugView from '../components/DebugView';
@@ -689,8 +689,10 @@ const styles2 = StyleSheet.create({
 });
 
 
+type AddCartStateType = 'subtract' | 'qty' | 'add'
 function AddToCart({ record }) {
   const [qty, setQty] = useState(1)
+  const [value, setValue] = React.useState<AddCartStateType>('add');
   function makeDiff(diff) {
     const newValue = Number(qty) + diff
     if (newValue < 1) {
@@ -699,13 +701,38 @@ function AddToCart({ record }) {
       setQty(newValue)
     }
   }
+
+  function handleOnPress(value: AddCartStateType){
+    setValue(value)
+    if(value === 'subtract'){
+      makeDiff(-1)
+    } else if(value === 'add'){
+      makeDiff(1)
+    }
+  }
   return (
     <View style={styles.addToCartContainer}>
-      <Button style={styles.minusButton} labelStyle={styles.minusButtonText} onPress={() => makeDiff(-1)}>-</Button>
-      <View style={styles.qtyInputContainer}>
-        <TextInput style={styles.qtyInput} value={qty + ''} onChangeText={value => setQty(Number(value))} />
-      </View>
-      <Button style={styles.plusButton} labelStyle={styles.plusButtonText} onPress={() => makeDiff(1)}>+</Button>
+      <SegmentedButtons
+        value={value}
+        onValueChange={handleOnPress}
+        buttons={[
+          {
+            value: 'subtract',
+            label: '-',
+            labelStyle: styles.qtyButton,
+          },
+          {
+            value: 'qty',
+            label: qty + '',
+            labelStyle: styles.qtyText,
+          },
+          {
+            value: 'add',
+            label: '+',
+            labelStyle: styles.qtyButton,
+          },
+        ]}
+      />
     </View>
   )
 }
@@ -807,6 +834,13 @@ const styles = StyleSheet.create({
   selectInputContainer: {
     flexDirection: 'row',
     marginTop: 2,
+  },
+  qtyButton: {
+    color: colors.color_primary_600,
+    fontSize: 24,
+  },
+  qtyText: {
+    fontSize: 18,
   },
 });
 
