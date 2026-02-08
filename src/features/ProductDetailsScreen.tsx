@@ -366,9 +366,7 @@ export default function ProductDetailsScreen({ navigation, route }) {
 
   return (
     <FeatureContainer loading={isLoading}>
-      <ScrollView>
-        <AddToCart record={record} />
-        <CustomButton onPress={query.refetch}>reload</CustomButton>
+      <ScrollView contentContainerStyle={styles.scrollViewContentContainer}>
         <View style={{ flexDirection: 'row' }}>
           {/* <Text style={styles.debugSubtleText}>productConfig: {JSON.stringify(productConfig, null, 2)}{'\n'}{JSON.stringify(variantDebugQuery.data)}</Text> */}
           {/* <Text style={styles.debugSubtleText}>attrChecked: {JSON.stringify(attrChecked, null, 2)}</Text> */}
@@ -393,27 +391,33 @@ export default function ProductDetailsScreen({ navigation, route }) {
         {/* <Text style={styles.debugSubtleText}>all_ptav:: {JSON.stringify(all_ptav)}</Text> */}
         {/* <Text style={styles.debugSubtleText}>productAttributes:: {JSON.stringify(productAttributes.data)}</Text> */}
 
+        {/* todo: put this image in a portal to allow smooth zoom */}
         <OdooImage
           model={combinationQuery.data?.product_id ? 'product.product' : 'product.template'}
           recordId={combinationQuery.data?.product_id ? combinationQuery.data?.product_id : record.id}
           field_name='image_512'
           style={styles.image}
         />
-        <Text style={rs.textDebug}>{JSON.stringify(query.error)}</Text>
+        <AddToCart record={record} />
+        {/* <Text style={rs.textDebug}>{JSON.stringify(query.error)}</Text> */}
         {record.description_sale ? <CustomText>{record.description_sale}</CustomText> : null}
-        <AmountText amount={record?.list_price} currencyData={record.currency_id} />
-        {combinationQuery.data?.price_extra ? <>
-          <Text>+</Text>
-          <AmountText amount={combinationQuery.data?.price_extra} currencyData={record.currency_id} />
-        </>
-          : null}
+        <ProductPrice record={record} combinationQuery={combinationQuery} />
         <ProductTemplateAttributes record={record} productConfig={productConfig} setProductConfig={setProductConfig} combinationQuery={combinationQuery} extraPriceQuery={extraPriceQuery} />
+        <View style={{height: 10}} />
         <AddToCart record={record} />
         {/* <DebugView/> headersMap*/}
       </ScrollView>
     </FeatureContainer>
   );
 };
+
+function ProductPrice({ record, combinationQuery }) {
+  return (
+    <>
+      <AmountText amount={record?.list_price + (combinationQuery.data?.price_extra ?? 0)} currencyData={record.currency_id} />
+    </>
+  )
+}
 
 function ProductTemplateAttributes({ record, productConfig, setProductConfig, combinationQuery, extraPriceQuery }) {
   const all_ptal = record.valid_product_template_attribute_line_ids ?? []
@@ -515,10 +519,18 @@ function ProductTemplateAttributes({ record, productConfig, setProductConfig, co
         const theme = useTheme();
         return (
           <View key={ptal.id} style={styles.attributeContainer}>
-            <Text style={styles.attrNameText}>{ptal.attribute_id?.display_name} ::{ptal.attribute_id?.display_type}</Text>
+            {isDropdown ? undefined :
+              <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+                <Text style={styles.attrNameText}>{ptal.attribute_id?.display_name}</Text>
+                <View style={{ borderBottomWidth: 1, borderColor: '#D1D5DB', flex: 1, marginHorizontal: 5, }} />
+                <Divider />
+              </View>
+            }
 
             {isDropdown ? <Dropdown
-              label={ptal.attribute_id?.display_name}
+              label={
+                <Text style={styles.attrNameText}>{ptal.attribute_id?.display_name}</Text>
+              }
               placeholder="Select an Option"
               options={dropDownOptions}
               value={dropDownValue}
@@ -576,7 +588,7 @@ function ProductTemplateAttributes({ record, productConfig, setProductConfig, co
             /> : null}
 
             <View style={isPills ? styles.attributeValuesContainerPills : styles.attributeValuesContainer}>
-              {(isRadio || isCheckbox || isPills) ? ptal.product_template_value_ids?.map(ptav => {
+              {(isRadio || isCheckbox || isPills) ? ptal.product_template_value_ids?.map((ptav, ptavIndex) => {
                 function handleChange() {
                   console.log('#setAttrCheckedBulk #1')
                   console.log(ptal);
@@ -588,40 +600,44 @@ function ProductTemplateAttributes({ record, productConfig, setProductConfig, co
                 const isSelected = isAttributeChecked_array(ptav.id)
                 const extraPrice = extraPriceQuery.data?.find(item => item.id === ptav.id)
                 const hasExtraPrice = extraPrice?.id
-                return (<TouchableOpacity style={styles.attrContainer} key={ptav.id} onPress={handleChange}>
-                  {isRadio ?
-                    <RadioButton
-                      value={`${ptal.attribute_id.id}.${ptav.id}`}
-                      status={isSelected ? 'checked' : 'unchecked'} onPress={handleChange}
-                    /> : null}
-                  {isCheckbox ?
-                    <Checkbox
-                      status={isSelected ? 'checked' : 'unchecked'} onPress={handleChange}
-                    /> : null}
-                  {isPills ?
-                    <Chip style={[styles.attributePill, isSelected ? { backgroundColor: theme.colors.primary } : undefined]} selected={isSelected} onPress={handleChange}
-                      showSelectedCheck={false}
-                      selectedColor={isSelected ? theme.colors.onPrimary : theme.colors.primary}
-                    >
-                      {
-                        hasExtraPrice ?
-                          <View style={styles.chipInnerContainer}>
-                            <CustomText variant='labelLarge' style={{ color: isSelected ? theme.colors.onPrimary : theme.colors.primary }}>{ptav.name}</CustomText>
-                            {hasExtraPrice ? <PriceExtraBadge extraPrice={extraPrice} size='small' /> : null}
-                          </View>
-                          :
-                          ptav.name
+                return (
+                  <>
+                    <TouchableOpacity style={styles.attrContainer} key={ptav.id} onPress={handleChange}>
+                      {isRadio ?
+                        <RadioButton
+                          value={`${ptal.attribute_id.id}.${ptav.id}`}
+                          status={isSelected ? 'checked' : 'unchecked'} onPress={handleChange}
+                        /> : null}
+                      {isCheckbox ?
+                        <Checkbox
+                          status={isSelected ? 'checked' : 'unchecked'} onPress={handleChange}
+                        /> : null}
+                      {isPills ?
+                        <Chip style={[styles.attributePill, isSelected ? { backgroundColor: theme.colors.primary } : undefined]} selected={isSelected} onPress={handleChange}
+                          showSelectedCheck={false}
+                          selectedColor={isSelected ? theme.colors.onPrimary : theme.colors.primary}
+                        >
+                          {
+                            hasExtraPrice ?
+                              <View style={styles.chipInnerContainer}>
+                                <CustomText variant='labelLarge' style={{ color: isSelected ? theme.colors.onPrimary : theme.colors.primary }}>{ptav.name}</CustomText>
+                                {hasExtraPrice ? <PriceExtraBadge extraPrice={extraPrice} size='small' /> : null}
+                              </View>
+                              :
+                              ptav.name
+                          }
+                        </Chip>
+                        : null}
+                      {isColor ? <View style={[styles.colorView, colorStyle]} /> : null}
+                      {isPills ? null :
+                        <View style={{ flexDirection: 'row', alignItems: 'center' } as ViewStyle}>
+                          <CustomText>{ptav.display_name} @{ptav.id}.{ptav.name}</CustomText>
+                          {hasExtraPrice ? <PriceExtraBadge extraPrice={extraPrice} /> : null}
+                        </View>
                       }
-                    </Chip>
-                    : null}
-                  {isColor ? <View style={[styles.colorView, colorStyle]} /> : null}
-                  {isPills ? null :
-                    <View style={{ flexDirection: 'row', alignItems: 'center' } as ViewStyle}>
-                      <CustomText>{ptav.display_name} @{ptav.id}.{ptav.name}</CustomText>
-                      {hasExtraPrice ? <PriceExtraBadge extraPrice={extraPrice} /> : null}
-                    </View>
-                  }
-                </TouchableOpacity>)
+                    </TouchableOpacity>
+                  </>
+                )
               }) : null}
             </View>
           </View>
@@ -702,19 +718,28 @@ function AddToCart({ record }) {
     }
   }
 
-  function handleOnPress(value: AddCartStateType){
+  function handleOnPress(value: AddCartStateType) {
     setValue(value)
-    if(value === 'subtract'){
+    if (value === 'subtract') {
       makeDiff(-1)
-    } else if(value === 'add'){
+    } else if (value === 'add') {
       makeDiff(1)
     }
   }
+
+  function handleAdd() {
+
+  }
+
   return (
     <View style={styles.addToCartContainer}>
       <SegmentedButtons
         value={value}
         onValueChange={handleOnPress}
+        style={{
+          width: 230,  // width must be specified, because otherwise it 
+          marginHorizontal: 5,
+        }}
         buttons={[
           {
             value: 'subtract',
@@ -733,12 +758,17 @@ function AddToCart({ record }) {
           },
         ]}
       />
+      <Button mode='contained' style={styles.addToCartButton} onPress={handleAdd} icon='cart'>Add to Cart</Button>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
+  scrollViewContentContainer: {
+    marginHorizontal: 10,
+  },
   attrNameText: {
+    // this style is also used for Dropdown's label
     color: colors.color_primary_600,
   },
   attrContainer: {
@@ -748,13 +778,16 @@ const styles = StyleSheet.create({
   },
   image: {
     width: '100%',
-    height: 150,
-    // borderWidth: 4, borderColor: 'purple',
+    height: 256,
+    // borderWidth: 1, borderColor: 'purple',
   },
   addToCartContainer: {
-    margin: 25,
+    marginHorizontal: 10,
     flexDirection: 'row',
     // height: 42,
+  },
+  addToCartButton: {
+    alignSelf: 'flex-end',
   },
   minusButton: {
     // height: 42,
@@ -801,7 +834,8 @@ const styles = StyleSheet.create({
     borderColor: 'black',
   },
   attributeContainer: {
-    borderBottomColor: 'black',
+    marginVertical: 5,
+    borderBottomColor: '#eeeeee',
     borderBottomWidth: 1,
   },
   attributeValuesContainer: {

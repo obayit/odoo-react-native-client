@@ -49,12 +49,17 @@ const HomeNavigator = () => {
     // https://oblador.github.io/react-native-vector-icons/
     <MaterialCommunityIcons name={name} color={color} size={size} />
   );
+  const homeOptions = {
+    title: 'Home',
+    tabBarIcon: (props) => tabBarIcon({name: 'home', ...props}),
+  }
   const productsOptions = {
     title: 'Products',
     tabBarIcon: (props) => tabBarIcon({name: 'shopping', ...props}),
   }
   const productDetailsOptions = {
     title: 'Product Details',
+    tabBarIcon: (props) => tabBarIcon({name: 'file', ...props}),
   }
   const selectModelOptions = {
     title: 'Select a Model',
@@ -67,12 +72,10 @@ const HomeNavigator = () => {
   const ordersOptions = {
     tabBarIcon: (props) => tabBarIcon({name: 'star', ...props}),
   }
-  const homeOptions = {
-    tabBarIcon: (props) => tabBarIcon({name: 'home', ...props}),
-  }
   const HomeTabs = () =>
     <Tab.Navigator screenOptions={tabBarOptions}>
       {/* <Tab.Screen name='Menus' component={HomeScreen} options={homeOptions}/> */}
+      <Tab.Screen name={ScreenNames.Home} component={HomeScreen} options={homeOptions}/>
       <Tab.Screen name={ScreenNames.Products} component={Products} options={productsOptions}/>
       <Tab.Screen name={ScreenNames.ProductDetails} component={ProductDetailsScreen} options={productDetailsOptions}/>
       <Tab.Screen name='My Orders' component={OrdersList} options={ordersOptions}/>

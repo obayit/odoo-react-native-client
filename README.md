@@ -37,3 +37,6 @@ setTintColor
 SvgView.java:1
 ```
 That is because an incompatible version of react-native-svg is installed, see the above issue.
+
+### TODOs
+* add patch to make Card.Cover use expo-image instead of react-native's one (because react-native image doesn't send headers)

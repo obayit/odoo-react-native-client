@@ -2,6 +2,7 @@
 import { EndpointBuilder, FetchBaseQueryError, createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { isResponseOkAsync } from '../api/odoo_request';
 import { logOut, updateAuth } from './authSlice';
+import slug from '../utils/slug';
 
 const defaultFields = ['id', 'name'];
 const KEEP_UNUSED_DATA_FOR = 60  // cache time in seconds (60, is the default value)
@@ -285,8 +286,51 @@ export const odooApi = createApi({
         }
       }),
     }),
+    shop: builder.query({
+      query: (arg) => ({
+        url: composeShopUrl(arg),
+        method: 'POST',
+        body: {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            // categoryId: arg.selectedCategory.id,
+          },
+        }
+      }),
+    }),
+    productsHome: builder.query({
+      query: (arg) => ({
+        url: composeProductsHomeUrl(arg),
+        method: 'POST',
+        body: {
+          jsonrpc: "2.0",
+          method: "call",
+          params: {
+            // categoryId: arg.selectedCategory.id,
+          },
+        }
+      }),
+    }),
   }),
 });
+
+function composeShopUrl(arg){
+  let res = '/obi_dashboard/shop'
+  if(arg.selectedCategory?.id){
+    res += `/category/${slug(arg.selectedCategory)}`
+  }
+  return res
+}
+
+function composeProductsHomeUrl(arg){
+  let res = '/obi_app/products/home'
+  if(arg.selectedCategory?.id){
+    res += `/category/${slug(arg.selectedCategory)}`
+  }
+  return res
+}
+
 
 const capitalize = (str) => str[0].toUpperCase() + str.slice(1);
 

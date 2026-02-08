@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
+import { Image as NativeImage /* native image doesn't send headers in android */, View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import { useSelector } from "react-redux";
 import { selectAuth, selectConfiguration } from "../common/store/authSlice";
 import * as Clipboard from 'expo-clipboard';
@@ -10,6 +10,16 @@ export function useImageUrl({ model, recordId, field_name, appendUrl = '' }) {
     const configuration = useSelector(selectConfiguration)
     //   const clientInfo = useSelector(selectClientInfo)
     //   const cacheKey = `${model}.img.${field_name}.${recordId}`
+    const auth = useSelector(selectAuth)
+    const headers = {
+        // if you don't want to store session_id in redux for security reasons,
+        // you will have to implement your own Image logic including the following:
+        // caching images, (where to store files and when to delete them)
+        // fetching images only when the component is visible in the screen (or close in the scroll view)
+        'cookie': `session_id=${auth.session_id}`,
+        'X-Rando-H': 'yes',
+        Accept: "image/png",
+    }
     const UNIQUE_ID = useMemo(() =>
         Math.floor(Math.random() * (9999999999999 - 1000000000000 + 1)) + 1000000000000,
         [/*clientInfo[cacheKey]*/]
@@ -22,12 +32,13 @@ export function useImageUrl({ model, recordId, field_name, appendUrl = '' }) {
         : undefined;
     return {
         imageUrl,
+        headers,
         // cacheKey,
     }
 }
 
-export default function OdooImage({ model, recordId, field_name = 'image_medium', appendUrl = '', style }) {
-    const { imageUrl } = useImageUrl({
+export default function OdooImage({ model, recordId, field_name = 'image_medium', appendUrl = '', style = undefined }) {
+    const { imageUrl, headers } = useImageUrl({
         model,
         recordId,
         field_name,
@@ -39,7 +50,6 @@ export default function OdooImage({ model, recordId, field_name = 'image_medium'
         }
 
     }
-    const auth = useSelector(selectAuth)
     async function debugDownloadAsync() {
         const res = await fetch(imageUrl)
         console.log('#res');
@@ -49,14 +59,7 @@ export default function OdooImage({ model, recordId, field_name = 'image_medium'
         const blob = await res.blob();
         console.log(blob); // image data
     }
-    const headers = {
-        // if you don't want to store session_id in redux for security reasons,
-        // you will have to implement your own Image logic including the following:
-        // caching images, (where to store files and when to delete them)
-        // fetching images only when the component is visible in the screen (or close in the scroll view)
-        'cookie': `session_id=${auth.session_id}`,
-    }
-    const debugImage = true
+    const debugImage = false
 
     if (debugImage) {
         return (
