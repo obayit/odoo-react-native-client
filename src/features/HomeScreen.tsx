@@ -11,6 +11,7 @@ import OdooImage, { useImageUrl } from '../components/OdooImage';
 import CustomCardCover from '../components/CustomCardCover';
 import { useNavigation } from '@react-navigation/native';
 import { ScreenNames } from '../navigation/navigation.constants';
+import AmountText from '../components/AmountText';
 
 const Item = ({ item }) => {
   const rs = ReusableStyles
@@ -163,8 +164,9 @@ function ProductCard({ product, productsHomeQuery }) {
   return (
     <Card style={{ margin: 8, height: 500, borderWidth: 1, borderColor: 'lime', }}>
       <Card.Title title={product.name} subtitle={product.list_price} />
+      <AmountText amount={product.list_price} currencyData={product.currency_id} />
       <Card.Content>
-        <Text variant="titleLarge">{product.display_name}</Text>
+        <Text>={JSON.stringify(productsHomeQuery.data?.products_prices[product.id+'']?.price_reduce, null, 2)}</Text>
       </Card.Content>
       <Card.Cover
         source={{

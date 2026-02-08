@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Text, FlatList, View, StyleSheet, ScrollView, TouchableOpacity, ViewStyle } from 'react-native';
-
-import { FeatureContainer, ReusableStyles } from '../components';
-import { injectQuery, odooApi } from '../common/store/reduxApi';
-import useSingleRecord from '../common/hooks/useSingleRecord';
-import { CustomButton } from '../components/CustomButtons';
-import colors from '../components/colors';
 import { SegmentedButtons, Button, Checkbox, Chip, Divider, Icon, Menu, RadioButton, Surface, TextInput, TouchableRipple, useTheme } from 'react-native-paper';
-import CustomText from '../components/CustomText';
-import OdooImage from '../components/OdooImage';
-import DebugView from '../components/DebugView';
-import AmountText from '../components/AmountText';
 import { Dropdown, DropdownItemProps, Option as DropDownOption } from 'react-native-paper-dropdown';
+
+import { FeatureContainer, ReusableStyles } from '../../components';
+import { injectQuery, odooApi } from '../../common/store/reduxApi';
+import useSingleRecord from '../../common/hooks/useSingleRecord';
+import { CustomButton } from '../../components/CustomButtons';
+import colors from '../../components/colors';
+import CustomText from '../../components/CustomText';
+import OdooImage from '../../components/OdooImage';
+import DebugView from '../../components/DebugView';
+import AmountText from '../../components/AmountText';
 
 
 interface ProductConfigurationData {
