@@ -165,7 +165,6 @@ function ProductCard({ product, productsHomeQuery }) {
       <Card.Title title={product.name} subtitle={product.list_price} />
       <Card.Content>
         <Text variant="titleLarge">{product.display_name}</Text>
-        <Text>{JSON.stringify(headers)}</Text>
       </Card.Content>
       <Card.Cover
         source={{
