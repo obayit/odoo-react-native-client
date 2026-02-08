@@ -1,6 +1,8 @@
 # Odoo React Native Client
 This project is still in the early development stage, and major changes will be applied.
 
+## ⚠️ This app depends on a Odoo module found here: https://github.com/obayit/obi-app-api
+
 ## How to run
 This is a managed expo project, run the following commands to start the development: `npm install`, then`npx expo start`
 

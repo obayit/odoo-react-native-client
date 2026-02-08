@@ -9,6 +9,8 @@ import { useSelector } from 'react-redux';
 import { selectAuth } from '../common/store/authSlice';
 import OdooImage, { useImageUrl } from '../components/OdooImage';
 import CustomCardCover from '../components/CustomCardCover';
+import { useNavigation } from '@react-navigation/native';
+import { ScreenNames } from '../navigation/navigation.constants';
 
 const Item = ({ item }) => {
   const rs = ReusableStyles
@@ -151,12 +153,12 @@ function CategoriesNew() {
 const LeftContent = props => <Avatar.Icon {...props} icon="folder" />
 
 function ProductCard({ product, productsHomeQuery }) {
-  const auth = useSelector(selectAuth)
+  const navigation = useNavigation()
   const { imageUrl, headers } = useImageUrl({
     model: 'product.template',
     recordId: product.id,
     field_name: 'image_512',
-    // appendUrl,
+    // appendUrled
   })
   return (
     <Card style={{ margin: 8, height: 500, borderWidth: 1, borderColor: 'lime', }}>
@@ -172,8 +174,8 @@ function ProductCard({ product, productsHomeQuery }) {
         }}
       />
       <Card.Actions>
-        <Button onPress={productsHomeQuery.refetch}>Cancel</Button>
-        <Button onPress={productsHomeQuery.refetch}>Ok</Button>
+        <Button onPress={productsHomeQuery.refetch}>Reload Query</Button>
+        <Button onPress={() => navigation.navigate(ScreenNames.ProductDetails, { recordId: product.id })}>Ok</Button>
       </Card.Actions>
     </Card>
 

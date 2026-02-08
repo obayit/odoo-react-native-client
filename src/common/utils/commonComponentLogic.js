@@ -87,3 +87,7 @@ export function getRtkErrorMessage(error){
     }
     return 'Error'
 }
+
+export function groupList(data_list, perGroup=2){
+
+}
