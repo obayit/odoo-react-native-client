@@ -18,6 +18,8 @@ import colors from '../components/colors';
 import { StyleSheet } from 'react-native';
 import ProductDetailsScreen from '../features/ProductDetailsScreen';
 import { ScreenNames } from './navigation.constants';
+import ProfileScreen from '../features/ProfileScreen';
+import EditProfileScreen from '../features/EditProfileScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -57,10 +59,6 @@ const HomeNavigator = () => {
     title: 'Products',
     tabBarIcon: (props) => tabBarIcon({name: 'shopping', ...props}),
   }
-  const productDetailsOptions = {
-    title: 'Product Details',
-    tabBarIcon: (props) => tabBarIcon({name: 'file', ...props}),
-  }
   const selectModelOptions = {
     title: 'Select a Model',
     tabBarIcon: (props) => tabBarIcon({name: 'file-search', ...props}),
@@ -72,14 +70,17 @@ const HomeNavigator = () => {
   const ordersOptions = {
     tabBarIcon: (props) => tabBarIcon({name: 'star', ...props}),
   }
+  const profileOptions = {
+    tabBarIcon: (props) => tabBarIcon({name: 'account', ...props}),
+  }
   const HomeTabs = () =>
     <Tab.Navigator screenOptions={tabBarOptions}>
       {/* <Tab.Screen name='Menus' component={HomeScreen} options={homeOptions}/> */}
       <Tab.Screen name={ScreenNames.Home} component={HomeScreen} options={homeOptions}/>
       <Tab.Screen name={ScreenNames.Products} component={Products} options={productsOptions}/>
-      <Tab.Screen name={ScreenNames.ProductDetails} component={ProductDetailsScreen} options={productDetailsOptions}/>
       <Tab.Screen name='My Orders' component={OrdersList} options={ordersOptions}/>
-      <Tab.Screen name='Select Model' component={SelectModel} options={selectModelOptions}/>
+      {/* <Tab.Screen name='Select Model' component={SelectModel} options={selectModelOptions}/> */}
+      <Tab.Screen name={ScreenNames.Profile} component={ProfileScreen} options={profileOptions}/>
     </Tab.Navigator>
 
   return (
@@ -87,6 +88,8 @@ const HomeNavigator = () => {
       <Stack.Screen name='Home Tabs' component={HomeTabs} options={{headerShown: false}}/>
       <Stack.Screen name='Dynamic List' component={DynamicList} options={dynamicOptions}/>
       <Stack.Screen name='Edit Product' component={EditProduct}/>
+      <Stack.Screen name={ScreenNames.ProductDetails} component={ProductDetailsScreen} />
+      <Stack.Screen name={ScreenNames.EditProfile} component={EditProfileScreen} />
     </Stack.Navigator>
   );
 }

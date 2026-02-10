@@ -21,6 +21,7 @@ function DebugView() {
       if(testProduct){
         navigation.navigate(ScreenNames.ProductDetails, { recordId: testProduct });
       }
+      // navigation.navigate(ScreenNames.EditProfile);
     }, 500);
   }, [])
   return (

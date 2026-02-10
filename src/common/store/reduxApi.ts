@@ -10,6 +10,12 @@ export const emptyList = []
 export const emptyObject = {}
 const newOdooVersion = true
 
+const emptyJsonRpcBody = {
+  jsonrpc: "2.0",
+  method: "call",
+  params: {},
+}
+
 const baseQuery = async (args, api, extraOptions) => {
   const baseUrl = api.getState().configuration?.baseUrl
   const rawBaseQuery = fetchBaseQuery({
@@ -301,16 +307,33 @@ export const odooApi = createApi({
     }),
     productsHome: builder.query({
       query: (arg) => ({
-        url: composeProductsHomeUrl(arg),
+        // url: composeProductsHomeUrl(arg),
+        url: '/obi_app/products/home',
         method: 'POST',
         body: {
           jsonrpc: "2.0",
           method: "call",
           params: {
-            // categoryId: arg.selectedCategory.id,
+            categoryId: arg.selectedCategory.id,
+            search: arg.search,
+            page: arg.page,
           },
         }
       }),
+    }),
+    profile: builder.query({
+      query: (arg) => ({
+        // url: composeProductsHomeUrl(arg),
+        url: '/obi_app/profile',
+        method: 'POST',
+        body: emptyJsonRpcBody,
+      }),
+    }),
+    updateProfile: builder.mutation({
+      query: (args) => (baseOdooRequest({
+        url: '/obi_app/profile/edit',
+        params: args,
+      })),
     }),
   }),
 });

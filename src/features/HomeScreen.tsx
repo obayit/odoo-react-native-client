@@ -3,15 +3,18 @@ import { ScrollView, FlatList, View, StyleSheet } from 'react-native';
 
 import { FeatureContainer, ReusableStyles } from '../components';
 import { injectQuery, odooApi } from '../common/store/reduxApi';
-import { Text, List, Button, Card, Avatar } from 'react-native-paper';
+import { Text, List, Button, Card, Avatar, Searchbar, Icon, SegmentedButtons } from 'react-native-paper';
 import DebugView from '../components/DebugView';
 import { useSelector } from 'react-redux';
 import { selectAuth } from '../common/store/authSlice';
 import OdooImage, { useImageUrl } from '../components/OdooImage';
-import CustomCardCover from '../components/CustomCardCover';
 import { useNavigation } from '@react-navigation/native';
 import { ScreenNames } from '../navigation/navigation.constants';
 import AmountText from '../components/AmountText';
+import { groupList } from '../common/utils/commonComponentLogic';
+import DataGrid from '../components/DataGrid';
+import CustomSearch from '../components/CustomSearch';
+import Pagination from '../components/Pagination';
 
 const Item = ({ item }) => {
   const rs = ReusableStyles
@@ -77,7 +80,10 @@ function Categories() {
         onRefresh={shopQuery.refetch}
         refreshing={shopQuery.isFetching}
         style={{ height: 50 }}
-        contentContainerStyle={{ height: 50, borderWidth: 1, borderColor: 'red', }}
+        contentContainerStyle={{
+          height: 50,
+          // borderWidth: 1, borderColor: 'red',
+        }}
         renderItem={props =>
           <View style={styles.categoryButtonContainer}>
             <Button style={styles.categoryButton} key={props.item.id}
@@ -101,9 +107,17 @@ function CategoriesNew() {
     id: 0,
     display_name: '',
   })
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [page, setPage] = useState(0)
   const productsHomeQuery = odooApi.useProductsHomeQuery({
     selectedCategory,
+    search: searchTerm,
+    page: page + 1,
   })
+
+  const productsList = productsHomeQuery.data?.products
+  const pagination = productsHomeQuery.data?.pagination as PaginationData
+  // const productsList = groupList(productsHomeQuery.data?.products)
 
   return (
     <>
@@ -115,7 +129,10 @@ function CategoriesNew() {
           data={productsHomeQuery.data?.categories}
           onRefresh={productsHomeQuery.refetch}
           refreshing={productsHomeQuery.isFetching}
-          contentContainerStyle={{ height: 50, borderWidth: 1, borderColor: 'red', }}
+          contentContainerStyle={{
+            height: 50,
+            // borderWidth: 1, borderColor: 'red',
+          }}
           renderItem={props =>
             <View style={styles.categoryButtonContainer}>
               <Button style={styles.categoryButton} key={props.item.id}
@@ -126,16 +143,32 @@ function CategoriesNew() {
           }
         />
       </View>
+      {/* <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} /> */}
+      <CustomSearch
+        style={{
+          marginHorizontal: MARGIN_HORIZONTAL,
+          marginVertical: 8,
+        }}
+        handleSearch={term => setSearchTerm(term)}
+      />
       <FlatList
-        data={productsHomeQuery.data?.products}
+        data={productsList}
         onRefresh={productsHomeQuery.refetch}
         refreshing={productsHomeQuery.isFetching}
-        contentContainerStyle={{ borderWidth: 1, borderColor: 'green', }}
+        contentContainerStyle={{
+          // borderWidth: 1, borderColor: 'green'
+        }}
+        numColumns={2}
         renderItem={props =>
-          <ProductCard product={props.item} productsHomeQuery={productsHomeQuery} />
+          // <ProductCardDouble products={props.item} productsHomeQuery={productsHomeQuery} />
+          <ProductCard product={props.item} productsHomeQuery={productsHomeQuery}
+            style={{
+              flex: 1,
+            }} />
         }
       />
       {/* {productsHomeQuery.data?.products?.length ? <ProductCard product={productsHomeQuery.data?.products[0]} productsHomeQuery={productsHomeQuery} /> : null} */}
+      {pagination ? <Pagination page={page} setPage={setPage} totalLength={pagination.total_count} numberOfItemsPerPage={pagination.page_size} /> : null}
       {productsHomeQuery.error ?
         <ScrollView>
           <Text>{JSON.stringify(productsHomeQuery.error)}</Text>
@@ -146,14 +179,61 @@ function CategoriesNew() {
           <Text>{JSON.stringify(productsHomeQuery.data?.categories, null, 2)}</Text>
         </ScrollView>
         : null}
-      {/* <DebugView /> */}
+      <DebugView />
     </>
+  )
+}
+
+function Pagination2() {
+  return (
+    <SegmentedButtons
+      value={'prev'}
+      onValueChange={undefined}
+      style={{
+        width: 230,  // width must be specified, because otherwise it 
+        marginHorizontal: 5,
+      }}
+      buttons={[
+        {
+          value: 'first',
+          label: '<<',
+        },
+        {
+          value: 'prev',
+          label: '<',
+        },
+        {
+          value: 'info',
+          label: '',
+        },
+        {
+          value: 'next',
+          label: '>',
+        },
+        {
+          value: 'last',
+          label: '>>',
+        },
+      ]}
+    />
   )
 }
 
 const LeftContent = props => <Avatar.Icon {...props} icon="folder" />
 
-function ProductCard({ product, productsHomeQuery }) {
+function ProductCardDouble({ products, productsHomeQuery }) {
+  return (
+    <View style={{ flexDirection: 'row', borderWidth: 1, borderColor: 'red', }}>
+      {products.map(item =>
+        <ProductCard product={item} productsHomeQuery={productsHomeQuery}
+          style={{
+            width: '100%',
+          }}
+        />)}
+    </View>
+  )
+}
+function ProductCard({ product, productsHomeQuery, style = undefined }) {
   const navigation = useNavigation()
   const { imageUrl, headers } = useImageUrl({
     model: 'product.template',
@@ -161,27 +241,49 @@ function ProductCard({ product, productsHomeQuery }) {
     field_name: 'image_512',
     // appendUrled
   })
+  const products_prices = productsHomeQuery.data?.products_prices ?? {}
+  const currency_data = productsHomeQuery.data?.currency_data ?? {}
+  function handleNavigateToDetails() {
+    navigation.navigate(ScreenNames.ProductDetails, { recordId: product.id })
+  }
+
   return (
-    <Card style={{ margin: 8, height: 500, borderWidth: 1, borderColor: 'lime', }}>
-      <Card.Title title={product.name} subtitle={product.list_price} />
-      <AmountText amount={product.list_price} currencyData={product.currency_id} />
-      <Card.Content>
-        <Text>={JSON.stringify(productsHomeQuery.data?.products_prices[product.id+'']?.price_reduce, null, 2)}</Text>
-      </Card.Content>
+    <Card style={[{
+      margin: 8,
+      // borderWidth: 1,
+      // borderColor: 'lime',
+    }, style]} onPress={handleNavigateToDetails}>
+      <Card.Title title={product.name} subtitle={
+        <AmountText amount={products_prices[product.id + '']?.price_reduce} currencyData={currency_data} />
+      } />
       <Card.Cover
         source={{
           uri: imageUrl,
           headers,  // fyi: this won't work on android because react-native's Image is broken there, must patch it to use expo-image instead.
         }}
+        contentFit='contain'  // we override this with expo-image which supports contentFit instead of resizeMode
       />
-      <Card.Actions>
-        <Button onPress={productsHomeQuery.refetch}>Reload Query</Button>
-        <Button onPress={() => navigation.navigate(ScreenNames.ProductDetails, { recordId: product.id })}>Ok</Button>
-      </Card.Actions>
     </Card>
 
   )
 }
+
+const Search = ({ searchTerm, setSearchTerm }) => {
+
+  return (
+    <Searchbar
+      style={{
+        marginHorizontal: 8,
+        marginVertical: 8,
+      }}
+      placeholder="Search"
+      onChangeText={setSearchTerm}
+      autoCapitalize='none'
+      value={searchTerm}
+      clearIcon={props => <Icon {...props} source='delete' />}
+    />
+  );
+};
 
 const styles = StyleSheet.create({
   categoryButton: {
@@ -543,3 +645,14 @@ const meh2 = [
 38] "GET /web/image/product.template/23/image_512?unique=1181843860331 HTTP/1.1" 404 - 1 0.002 0.004
 
 */
+
+const MARGIN_HORIZONTAL = 8
+
+type PaginationData = {
+  current_page: number
+  total_pages: number
+  page_size: number
+  total_count: number
+  has_next: Boolean
+  has_prev: Boolean
+}

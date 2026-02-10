@@ -398,7 +398,6 @@ export default function ProductDetailsScreen({ navigation, route }) {
           field_name='image_512'
           style={styles.image}
         />
-        <AddToCart record={record} />
         {/* <Text style={rs.textDebug}>{JSON.stringify(query.error)}</Text> */}
         {record.description_sale ? <CustomText>{record.description_sale}</CustomText> : null}
         <ProductPrice record={record} combinationQuery={combinationQuery} />

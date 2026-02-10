@@ -89,5 +89,10 @@ export function getRtkErrorMessage(error){
 }
 
 export function groupList(data_list, perGroup=2){
-
+    data_list = data_list ?? []
+    const groups = [];
+    for (let i = 0; i < data_list.length; i += perGroup) {
+        groups.push(data_list.slice(i, i + perGroup));
+    }
+    return groups
 }

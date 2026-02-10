@@ -12,7 +12,7 @@ export default function TextInputInner({ name, style, label, inputProps, onChang
     name = field.name;
     required = field.required;
     label = field.label;
-  _}
+  }
 
   const methods = useFormContext();
   const {
