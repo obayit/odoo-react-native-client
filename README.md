@@ -42,3 +42,7 @@ That is because an incompatible version of react-native-svg is installed, see th
 
 ### TODOs
 * add patch to make Card.Cover use expo-image instead of react-native's one (because react-native image doesn't send headers)
+
+### Known Issues ⚠️
+* SelectionInput (aka Dropdown)
+  - first tab doesn't open the options menu!

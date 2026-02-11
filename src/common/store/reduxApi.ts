@@ -335,6 +335,12 @@ export const odooApi = createApi({
         params: args,
       })),
     }),
+    updateProfileData: builder.query({
+      query: (args) => (baseOdooRequest({
+        url: '/obi_app/profile/edit/data',
+        params: args,
+      })),
+    }),
   }),
 });
 

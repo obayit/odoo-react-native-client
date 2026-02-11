@@ -11,6 +11,9 @@ function DebugView() {
   const configuration = useSelector(selectConfiguration)
   const navigation = useNavigation()
   useEffect(() => {
+    if(!process.env.EXPO_PUBLIC_DEBUG_MODE){
+      return
+    }
     setTimeout(() => {
       const testProduct =
       // 9 // customizable desk
@@ -21,9 +24,10 @@ function DebugView() {
       if(testProduct){
         navigation.navigate(ScreenNames.ProductDetails, { recordId: testProduct });
       }
-      // navigation.navigate(ScreenNames.EditProfile);
+      navigation.navigate(ScreenNames.EditProfile);
     }, 500);
   }, [])
+  return null
   return (
     <View style={styles.debugContainer}>
       <Text style={styles.titleText}>Debugging View:</Text>

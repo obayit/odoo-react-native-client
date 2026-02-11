@@ -7,12 +7,14 @@ import { Button, Snackbar, Text } from 'react-native-paper'
 
 import { useDispatch } from 'react-redux';
 import { logOut } from '../common/store/authSlice';
-import { emptyObject, odooApi, useProductsQuery } from '../common/store/reduxApi';
-import { FormProvider } from 'react-hook-form';
+import { emptyList, emptyObject, odooApi, useProductsQuery } from '../common/store/reduxApi';
+import { FormProvider, useWatch } from 'react-hook-form';
 import useForm from '../common/hooks/useForm';
 import { MaterialIcons } from '@expo/vector-icons';
 import { CustomButton } from '../components/CustomButtons';
 import { useNavigation } from '@react-navigation/native';
+import SelectionInput from '../components/SelectionInput';
+import { CustomSpacer, SectionHeader } from '../components/Utils';
 
 
 export default ({ route }) => {
@@ -55,14 +57,14 @@ export default ({ route }) => {
     label: 'State',
     required: true,
     type: 'm2o',
-    accessor: record => record?.address?.state?.name,
+    accessor: record => record?.address?.state?.id,
   };
   const fieldCountry = {
     name: 'country_id',
     label: 'Country',
     required: true,
     type: 'm2o',
-    accessor: record => record?.address?.country?.name,
+    accessor: record => record?.address?.country?.id,
   };
   let fields = [
     fieldName,
@@ -74,7 +76,12 @@ export default ({ route }) => {
   ]
 
   const { formMethods } = useForm(fields, { record });
+  const watchedCountryId = useWatch({ name: 'country_id', control: formMethods.control })
   const [submitQueryFn, submitQuery] = odooApi.useUpdateProfileMutation()
+  const editDataQuery = odooApi.useUpdateProfileDataQuery({
+    countryId: watchedCountryId,
+  })
+  const editData = editDataQuery.data ?? emptyList
   const [snackbarData, setSnackbarData] = useState({
     visible: false,
     contentText: '',
@@ -91,7 +98,7 @@ export default ({ route }) => {
   }
 
   const sharedInputProps = {
-    disabled: submitQuery.isLoading
+    disabled: submitQuery.isLoading || profileQuery.isLoading
   }
 
   function goBack() {
@@ -99,23 +106,34 @@ export default ({ route }) => {
   }
 
   return (
-    <FeatureContainer>
+    <FeatureContainer style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.formContainer}
         refreshControl={<RefreshControl refreshing={submitQuery.isLoading} />}
       >
         <FormProvider {...formMethods}>
+          <SectionHeader title='Personal Information' />
           <TextInput field={fieldName} inputProps={sharedInputProps} />
           <TextInput field={fieldEmail} inputProps={sharedInputProps} />
           <TextInput field={fieldPhone} inputProps={sharedInputProps} />
+          <SectionHeader title='Address' />
           <TextInput field={fieldCity} inputProps={sharedInputProps} />
-          <TextInput field={fieldState} inputProps={sharedInputProps} />
-          <TextInput field={fieldCountry} inputProps={sharedInputProps} />
+          <SelectionInput field={fieldState} inputProps={sharedInputProps}
+            data={editData} optionsExtractor={data => data?.states?.map(country => ({ label: country.name, value: country.id + '' }))}
+          />
+          <SelectionInput field={fieldCountry} inputProps={sharedInputProps}
+            data={editData} optionsExtractor={data => data?.countries?.map(country => ({ label: country.name, value: country.id + '' }))}
+          />
+          <CustomSpacer />
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+          }}>
+            <Button mode='contained' onPress={formMethods.handleSubmit(submitFormAsync)} icon='content-save'>Save</Button>
+          </View>
+          {/* <Button onPress={() => {profileQuery.refetch(); editDataQuery.refetch()}} icon='refresh'>reload</Button> */}
 
-          <Button onPress={formMethods.handleSubmit(submitFormAsync)} icon='send'>Submit</Button>
-          <Button onPress={profileQuery.refetch} icon='refresh'>reload</Button>
-
-
-
+          {/* <Text>{JSON.stringify(editData)}</Text> */}
+          {/* {editDataQuery.error ? <Text>{JSON.stringify(editDataQuery.error)}</Text> : null } */}
         </FormProvider>
       </ScrollView>
       <Snackbar
@@ -134,5 +152,6 @@ export default ({ route }) => {
 const styles = StyleSheet.create({
   formContainer: {
     margin: 8,
+    paddingBottom: 72, // Add padding so content doesn't hide behind button
   },
 });
