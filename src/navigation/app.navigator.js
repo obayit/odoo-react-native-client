@@ -136,3 +136,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto_700Bold',
   },
 });
+
+/*
+new Navigation/Router features:
+ - guard screens with Stack.Protected
+ - 
+*/
