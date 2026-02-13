@@ -12,10 +12,12 @@ import CustomText from '../../components/CustomText';
 import OdooImage from '../../components/OdooImage';
 import DebugView from '../../components/DebugView';
 import AmountText from '../../components/AmountText';
+import { CustomSpacer } from '../../components/Utils';
+import { useSelector } from 'react-redux';
 
 
 interface ProductConfigurationData {
-  variantId: number;
+  // variantId: number;
   // combination: Array<AttrValuePair>;
   _combination: Array<number>;
   qty: Number;
@@ -34,7 +36,7 @@ export default function ProductDetailsScreen({ navigation, route }) {
   const recordId = passedRecord?.id ?? route.params.recordId
   // const [attrChecked, _setAttrChecked] = useState<AttrValuePair[]>([])
   const [productConfig, setProductConfig] = useState<ProductConfigurationData>({
-    variantId: 0,
+    // variantId: 0,
     // combination: [],
     _combination: [],
     qty: 1,
@@ -60,21 +62,6 @@ export default function ProductDetailsScreen({ navigation, route }) {
   })
   const all_ptal = record.valid_product_template_attribute_line_ids
   const all_ptav = all_ptal?.flatMap(item => item.product_template_value_ids)
-  const { query: variantDebugQuery } = useSingleRecord({
-    model: 'product.product',
-    recordId: productConfig.variantId,
-    queryKwArgs: {
-      specification: {
-        id: {},
-        name: {},
-        product_template_variant_value_ids: {
-          fields: {
-            display_name: {}
-          }
-        }
-      }
-    }
-  })
   const { query: productAttributes } = useSingleRecord({
     model: 'product.attribute',
     recordId: 1,
@@ -88,9 +75,13 @@ export default function ProductDetailsScreen({ navigation, route }) {
   })
   // const [combinationQueryFn, combinationQuery] = odooApi.useLazyGetCombinationInfoQuery()
   const combinationQueryFn = () => { throw 'unimplemented combinationQueryFn' }
+  function getProductId(){
+    // todo: review this, we need to save the product_id somewhere that can be used as a parameter for combinationQuery, but we get it from there too, so, how to do this without creating an infinite loop of change
+    return combinationQuery?.data?.product_id ?? 0
+  }
   const combinationParams = {
     "product_template_id": recordId,
-    "product_id": productConfig.variantId,
+    "product_id": getProductId(),
     // "combination": combinationStateToApi(productConfig.combination),
     "combination": productConfig._combination,
     "add_qty": productConfig.qty,
@@ -102,6 +93,22 @@ export default function ProductDetailsScreen({ navigation, route }) {
   }
     // todo: add skip here, when combination or recordId are empty
   )
+  const product_id = combinationQuery.data?.product_id ?? 0
+  const { query: variantDebugQuery } = useSingleRecord({
+    model: 'product.product',
+    recordId: product_id,
+    queryKwArgs: {
+      specification: {
+        id: {},
+        name: {},
+        product_template_variant_value_ids: {
+          fields: {
+            display_name: {}
+          }
+        }
+      }
+    }
+  })
 
   const extraPriceQuery = odooApi.useGetAttributeExtraPriceQuery({
     model: 'product.template.attribute.value',
@@ -165,7 +172,7 @@ export default function ProductDetailsScreen({ navigation, route }) {
       // combination: combinationState,
       params: {
         "product_template_id": recordId,
-        "product_id": product_id ?? productConfig.variantId,
+        // "product_id": product_id ?? productConfig.variantId,
         "combination": combinationApi,
         "add_qty": productConfig.qty,
         "parent_combination": []  // ?what is this
@@ -200,7 +207,7 @@ export default function ProductDetailsScreen({ navigation, route }) {
       console.log(newCombination);
       setProductConfig(prev => ({
         ...prev,
-        variantId: newVariantId ?? prev.variantId,
+        // variantId: newVariantId ?? prev.variantId,
         combination: newCombination ?? prev.combination,
       }))
     } catch (error) {
@@ -368,14 +375,14 @@ export default function ProductDetailsScreen({ navigation, route }) {
     <FeatureContainer loading={isLoading}>
       <ScrollView contentContainerStyle={styles.scrollViewContentContainer}>
         <View style={{ flexDirection: 'row' }}>
-          {/* <Text style={styles.debugSubtleText}>productConfig: {JSON.stringify(productConfig, null, 2)}{'\n'}{JSON.stringify(variantDebugQuery.data)}</Text> */}
+          <Text style={styles.debugSubtleText}>productConfig: {JSON.stringify(productConfig, null, 2)}{'\n'}{JSON.stringify(variantDebugQuery.data)}</Text>
           {/* <Text style={styles.debugSubtleText}>attrChecked: {JSON.stringify(attrChecked, null, 2)}</Text> */}
           {/* <Text style={styles.debugSubtleText}>combination: {JSON.stringify(stripHtmlDebug(combinationQuery.data), null, 2)}</Text> */}
           {/* <Text style={styles.debugSubtleText}>product_id: {combinationQuery.data?.product_id}</Text> */}
           {/* <Text style={styles.debugSubtleText}>extraPriceQuery: {JSON.stringify(extraPriceQuery.data, null, null)}</Text> */}
 
           {/* {combinationQuery.error ? <Text style={styles.debugSubtleText}>combinationError: {JSON.stringify(combinationQuery.error, null, 2)}</Text> : null} */}
-          {/* <Text style={styles.debugSubtleText}>firstCombination: {JSON.stringify(getFirstCombinationQuery.data, null, 2)}</Text> */}
+          <Text style={styles.debugSubtleText}>firstCombination: {JSON.stringify(getFirstCombinationQuery.data, null, 2)}</Text>
           {/* <Text style={styles.debugSubtleText}>_ptav: {JSON.stringify(stripHtmlDebug(combinationQuery.data?._ptav), null, 2)}</Text> */}
           {/* <Text style={styles.debugSubtleText}>_combination: {JSON.stringify(combinationQuery.data?._combination, null, 2)}</Text> */}
         </View>
@@ -402,8 +409,9 @@ export default function ProductDetailsScreen({ navigation, route }) {
         {record.description_sale ? <CustomText>{record.description_sale}</CustomText> : null}
         <ProductPrice record={record} combinationQuery={combinationQuery} />
         <ProductTemplateAttributes record={record} productConfig={productConfig} setProductConfig={setProductConfig} combinationQuery={combinationQuery} extraPriceQuery={extraPriceQuery} />
-        <View style={{height: 10}} />
-        <AddToCart record={record} />
+        <View style={{ height: 10 }} />
+        <AddToCart record={record} productConfig={productConfig} setProductConfig={setProductConfig} combinationQuery={combinationQuery} />
+        <CustomSpacer height={100}/>
         {/* <DebugView/> headersMap*/}
       </ScrollView>
     </FeatureContainer>
@@ -521,7 +529,7 @@ function ProductTemplateAttributes({ record, productConfig, setProductConfig, co
             {isDropdown ? undefined :
               <View style={{ flexDirection: 'row', alignItems: 'center', }}>
                 <Text style={styles.attrNameText}>{ptal.attribute_id?.display_name}</Text>
-                <View style={{ borderBottomWidth: 1, borderColor: '#D1D5DB', flex: 1, marginHorizontal: 5, }} />
+                <View style={{ borderBottomWidth: 1, borderColor: colors.color_grey_600, flex: 1, marginHorizontal: 5, }} />
                 <Divider />
               </View>
             }
@@ -705,29 +713,51 @@ const styles2 = StyleSheet.create({
 
 
 type AddCartStateType = 'subtract' | 'qty' | 'add'
-function AddToCart({ record }) {
-  const [qty, setQty] = useState(1)
+function AddToCart({ record, productConfig, setProductConfig, combinationQuery }) {
+  const qty = productConfig.qty
   const [value, setValue] = React.useState<AddCartStateType>('add');
+  const [updateCartQueryFn, updateCartQuery] = odooApi.useUpdateCartMutation()
+
   function makeDiff(diff) {
     const newValue = Number(qty) + diff
     if (newValue < 1) {
-      setQty(1)
+      return 1
     } else {
-      setQty(newValue)
+      return newValue
     }
   }
 
   function handleOnPress(value: AddCartStateType) {
     setValue(value)
+    let newValue = undefined
     if (value === 'subtract') {
-      makeDiff(-1)
+      newValue = makeDiff(-1)
     } else if (value === 'add') {
-      makeDiff(1)
+      newValue = makeDiff(1)
+    }
+    if(newValue !== undefined){
+      setProductConfig(prev => ({
+        ...prev,
+        qty: newValue,
+      }))
     }
   }
 
-  function handleAdd() {
-
+  async function handleAddAsync() {
+    const params = {
+      "product_id": combinationQuery.data?.product_id ?? 0,
+      "product_custom_attribute_values": "[]",
+      "variant_values": [],
+      "no_variant_attribute_values": "[]",
+      "add_qty": productConfig.qty,
+      "display": false,
+      "force_create": true
+    }
+    console.log('#params');
+    console.log(params);
+    const response = await updateCartQueryFn(params).unwrap()
+    console.log('#response');
+    console.log(JSON.stringify(response, null, 2));
   }
 
   return (
@@ -757,7 +787,10 @@ function AddToCart({ record }) {
           },
         ]}
       />
-      <Button mode='contained' style={styles.addToCartButton} onPress={handleAdd} icon='cart'>Add to Cart</Button>
+      <Button mode='contained' style={styles.addToCartButton} onPress={handleAddAsync}
+      icon='cart'
+      loading={updateCartQuery.isLoading}
+      >Add to Cart</Button>
     </View>
   )
 }

@@ -7,6 +7,7 @@ import { Text, List, Button, Card, Avatar, Searchbar, Icon, SegmentedButtons } f
 import { useNavigation } from '@react-navigation/native';
 import { ScreenNames } from '../navigation/navigation.constants';
 import { IconSource } from 'react-native-paper/lib/typescript/components/Icon';
+import { SectionHeader } from '../components/Utils';
 
 export default ({ navigation, route }) => {
   return (
@@ -26,8 +27,9 @@ function ProfileView() {
         marginHorizontal: MARGIN_HORIZONTAL,
       }}
     >
-      {profileQuery.error ? <Text>{JSON.stringify(profileQuery.error, null, 2)}</Text> : null}
+      {/* {profileQuery.error ? <Text>{JSON.stringify(profileQuery.error, null, 2)}</Text> : null} */}
       {/* <Text>{JSON.stringify(profile, null, 2)}</Text> */}
+      <SectionHeader title='Personal Information' />
       <List.Item
         title={profile.name}
         description="Name"
@@ -45,6 +47,7 @@ function ProfileView() {
       />
       {profile.address ?
         <>
+          <SectionHeader title='Address' />
           <AccountDetail
             value={profile.address.zip}
             label="ZIP Code/Postcode"

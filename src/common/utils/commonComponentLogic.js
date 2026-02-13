@@ -30,6 +30,17 @@ export function displayDate(datetime){
     return formattedDate;
 }
 
+export function displayDateTime(datetime) {
+  if(!datetime){
+    return ''
+  }
+  let formattedDate = datetime + ''
+  try {
+    formattedDate = moment.utc(datetime).local().format("DD MMM YYYY hh:mm:ss A")
+  } catch { }
+  return formattedDate
+}
+
 export function displayM2o(value) {
   if (value && value.length === 2) {
     return value[1]

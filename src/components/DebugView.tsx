@@ -5,6 +5,7 @@ import { selectConfiguration } from '../common/store/authSlice'
 import { useNavigation } from '@react-navigation/native'
 import { useEffect } from 'react'
 import { ScreenNames } from '../navigation/navigation.constants'
+import { CustomSpacer } from './Utils'
 
 function DebugView() {
   const debugHook = useDebug()
@@ -24,7 +25,9 @@ function DebugView() {
       if(testProduct){
         navigation.navigate(ScreenNames.ProductDetails, { recordId: testProduct });
       }
-      navigation.navigate(ScreenNames.EditProfile);
+      // navigation.navigate(ScreenNames.EditProfile);
+      // navigation.navigate(ScreenNames.Cart);
+      // navigation.navigate(ScreenNames.MyOrders);
     }, 500);
   }, [])
   return null
@@ -35,6 +38,7 @@ function DebugView() {
       <Text>process.env.EXPO_PUBLIC_ODOO_DB = "{process.env.EXPO_PUBLIC_ODOO_DB}"</Text>
       {/* <Text>configuration "{JSON.stringify(configuration)}"</Text> */}
       <Button onPress={debugHook.clearRtkQuery} title='Clear RTK Query' color='#8A0000' />
+      <CustomSpacer />
     </View>
   )
 }

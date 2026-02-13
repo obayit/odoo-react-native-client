@@ -193,6 +193,7 @@ function getCommonSearchQuery(
 export const odooApi = createApi({
   reducerPath: 'odooApi',
   baseQuery: baseQueryWithInterceptor,
+  tagTypes: ['profile', 'cart', 'sale.order'],
   endpoints: (builder) => ({
     getPartners: builder.query(getCommonSearchQuery('res.partner')),
     products: builder.query(getCommonSearchQuery('product.product')),
@@ -221,19 +222,11 @@ export const odooApi = createApi({
       // },
     }),
     updateCart: builder.mutation({
-      query: ({ product_id, quantity = 1 }) => (baseOdooRequest({
+      query: (args) => (baseOdooRequest({
         url: '/shop/cart/update_json',
-        params: {
-          // TODO: continue from here
-          add_qty: 1,
-          force_create: true,
-          no_variant_attribute_values: [],  // see Attributes and values in the product form
-          product_custom_attribute_values: [],
-          product_id,
-          quantity,  // what dis?
-          variant_values: [],  // what dis?
-        },
+        params: args,
       })),
+      invalidatesTags: ['cart'],
       // Pick out data and prevent nested properties in a hook or selector
       // transformResponse: (response, meta, arg) => {
       //   return response;
@@ -328,18 +321,52 @@ export const odooApi = createApi({
         method: 'POST',
         body: emptyJsonRpcBody,
       }),
+      providesTags: ['profile'],
     }),
     updateProfile: builder.mutation({
       query: (args) => (baseOdooRequest({
         url: '/obi_app/profile/edit',
         params: args,
       })),
+      invalidatesTags: ['profile'],
     }),
     updateProfileData: builder.query({
       query: (args) => (baseOdooRequest({
         url: '/obi_app/profile/edit/data',
         params: args,
       })),
+    }),
+    cart: builder.query({
+      query: (args) => (baseOdooRequest({
+        url: '/obi_app/cart',
+        params: args,
+      })),
+      providesTags: ['cart'],
+    }),
+    skipPayment: builder.mutation({
+      query: (args) => (baseOdooRequest({
+        url: '/shop/cart/skip_payment',
+        params: args,
+      })),
+      invalidatesTags: ['cart', 'sale.order'],
+      // Pick out data and prevent nested properties in a hook or selector
+      // transformResponse: (response, meta, arg) => {
+      //   return response;
+      // },
+    }),
+    orders: builder.query({
+      query: (args) => (baseOdooRequest({
+        url: '/obi_app/orders',
+        params: args,
+      })),
+      providesTags: ['sale.order'],
+    }),
+    order: builder.query({
+      query: (args) => (baseOdooRequest({
+        url: '/obi_app/single_order',
+        params: args,
+      })),
+      providesTags: ['sale.order'],
     }),
   }),
 });
@@ -356,6 +383,14 @@ function composeProductsHomeUrl(arg){
   let res = '/obi_app/products/home'
   if(arg.selectedCategory?.id){
     res += `/category/${slug(arg.selectedCategory)}`
+  }
+  return res
+}
+
+function composeMyOrdersUrl(arg){
+  let res = '/obi_app/orders'
+  if(arg.orderId){
+    res += `/${arg.orderId}`
   }
   return res
 }

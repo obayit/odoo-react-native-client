@@ -43,7 +43,9 @@ const colors = {
   color_danger_600: "#BD2642",
   color_danger_700: "#9E1A3F",
   color_danger_800: "#7F1039",
-  color_danger_900: "#690A36"
+  color_danger_900: "#690A36",
+
+  color_grey_600: '#D1D5DB',
 }
 
 export default colors

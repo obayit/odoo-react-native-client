@@ -66,7 +66,7 @@ export default ({ route }) => {
     type: 'm2o',
     accessor: record => record?.address?.country?.id,
   };
-  let fields = [
+  const fields = [
     fieldName,
     fieldEmail,
     fieldPhone,
@@ -88,7 +88,15 @@ export default ({ route }) => {
   })
 
   async function submitFormAsync(data) {
-    const response = await submitQueryFn(data)
+    const dataToSubmit = {...data}
+    fields.map(field => {
+      if(['m2o'].includes(field.type)){
+        if(dataToSubmit[field.name]){
+          dataToSubmit[field.name] = Number(dataToSubmit[field.name])
+        }
+      }
+    })
+    const response = await submitQueryFn(dataToSubmit)
     if (response.data?.is_success) {
       setSnackbarData({
         visible: true,

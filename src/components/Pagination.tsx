@@ -10,7 +10,7 @@ type Props = {
   setPage: (value: number) => void
 }
 
-const Pagination = ({ totalLength, numberOfItemsPerPage=80, page, setPage }) => {
+const Pagination = ({ totalLength, numberOfItemsPerPage = 80, page, setPage }) => {
   // const [page, setPage] = React.useState(0);
   // const [numberOfItemsPerPage, onItemsPerPageChange] = React.useState(numberOfItemsPerPageList[0]);
   const from = page * numberOfItemsPerPage;
@@ -21,8 +21,6 @@ const Pagination = ({ totalLength, numberOfItemsPerPage=80, page, setPage }) => 
   }, [numberOfItemsPerPage]);
 
   return (
-    <>
-    <Text>numberOfItemsPerPage = {numberOfItemsPerPage+''}</Text>
     <DataTable.Pagination
       page={page}
       numberOfPages={Math.ceil(totalLength / numberOfItemsPerPage)}
@@ -35,7 +33,6 @@ const Pagination = ({ totalLength, numberOfItemsPerPage=80, page, setPage }) => 
 
       selectPageDropdownLabel={undefined}
     />
-    </>
   );
 };
 

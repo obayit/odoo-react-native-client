@@ -20,6 +20,9 @@ import ProductDetailsScreen from '../features/ProductDetailsScreen';
 import { ScreenNames } from './navigation.constants';
 import ProfileScreen from '../features/ProfileScreen';
 import EditProfileScreen from '../features/EditProfileScreen';
+import CartScreen from '../features/CartScreen';
+import MyOrdersScreen from '../features/MyOrdersScreen';
+import OrderDetailsScreen from '../features/OrderDetailsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -78,7 +81,8 @@ const HomeNavigator = () => {
       {/* <Tab.Screen name='Menus' component={HomeScreen} options={homeOptions}/> */}
       <Tab.Screen name={ScreenNames.Home} component={HomeScreen} options={homeOptions}/>
       <Tab.Screen name={ScreenNames.Products} component={Products} options={productsOptions}/>
-      <Tab.Screen name='My Orders' component={OrdersList} options={ordersOptions}/>
+      {/* <Tab.Screen name='My Orders' component={OrdersList} options={ordersOptions}/> */}
+      <Stack.Screen name={ScreenNames.MyOrders} component={MyOrdersScreen} options={ordersOptions} />
       {/* <Tab.Screen name='Select Model' component={SelectModel} options={selectModelOptions}/> */}
       <Tab.Screen name={ScreenNames.Profile} component={ProfileScreen} options={profileOptions}/>
     </Tab.Navigator>
@@ -90,6 +94,8 @@ const HomeNavigator = () => {
       <Stack.Screen name='Edit Product' component={EditProduct}/>
       <Stack.Screen name={ScreenNames.ProductDetails} component={ProductDetailsScreen} />
       <Stack.Screen name={ScreenNames.EditProfile} component={EditProfileScreen} />
+      <Stack.Screen name={ScreenNames.Cart} component={CartScreen} />
+      <Stack.Screen name={ScreenNames.OrderDetails} component={OrderDetailsScreen} />
     </Stack.Navigator>
   );
 }

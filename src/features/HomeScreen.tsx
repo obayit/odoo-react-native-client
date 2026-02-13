@@ -29,30 +29,6 @@ const Item = ({ item }) => {
 }
 
 export default ({ navigation, route }) => {
-  const rs = ReusableStyles;
-
-  // const { useQuery } = injectQuery('ir.ui.menu');
-  // const query = useQuery({
-  //   args: {
-  //     fields: [
-  //       'id',
-  //       'name',
-  //       'parent_id',
-  //       'sequence',
-  //     ],
-  //     domain: [
-  //       ['parent_id', '=', false],
-  //     ]
-  //   },
-  // },
-  // );
-  // const { data, isLoading } = query
-
-
-  useEffect(() => {
-    // setSavedLoginInfo();  // FIXME: activate this later
-  }, []);
-
   return (
     <FeatureContainer>
       <CategoriesNew />
@@ -121,6 +97,13 @@ function CategoriesNew() {
 
   return (
     <>
+      <CustomSearch
+        style={{
+          marginHorizontal: MARGIN_HORIZONTAL,
+          marginVertical: 8,
+        }}
+        handleSearch={term => setSearchTerm(term)}
+      />
       <View
         style={{ height: 50 }}
       >
@@ -144,13 +127,6 @@ function CategoriesNew() {
         />
       </View>
       {/* <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} /> */}
-      <CustomSearch
-        style={{
-          marginHorizontal: MARGIN_HORIZONTAL,
-          marginVertical: 8,
-        }}
-        handleSearch={term => setSearchTerm(term)}
-      />
       <FlatList
         data={productsList}
         onRefresh={productsHomeQuery.refetch}

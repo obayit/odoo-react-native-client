@@ -1,5 +1,6 @@
-import { StyleSheet, Text } from 'react-native'
+import { StyleSheet } from 'react-native'
 import colors from './colors'
+import { Text } from 'react-native-paper'
 
 export default function AmountText({ amount, currencyData }) {
     let currency_after = ''
@@ -15,20 +16,18 @@ export default function AmountText({ amount, currencyData }) {
     }
     return (
         <Text>
-            {currency_before ? <Text style={styles.currencyText}>{currency_before}</Text> : null}
-            <Text style={styles.numberText}>{(Math.round(amount * 100) / 100).toFixed(2)}</Text>
-            {currency_after ? <Text style={styles.currencyText}>{currency_after}</Text> : null}
+            {currency_before ? <Text variant='titleMedium' style={styles.currencyText}>{currency_before}</Text> : null}
+            <Text variant='titleMedium' style={styles.numberText}>{(Math.round(amount * 100) / 100).toFixed(2)}</Text>
+            {currency_after ? <Text variant='titleMedium' style={styles.currencyText}>{currency_after}</Text> : null}
         </Text>
     )
 }
 
 const styles = StyleSheet.create({
     currencyText: {
-        fontSize: 18,
         color: colors.color_primary_600,
     },
     numberText: {
-        fontSize: 18,
         color: colors.color_info_600,
     },
 })
