@@ -3,7 +3,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-export const SafeAreaLayout = ({ insets, ...props }) => {
+export const SafeAreaLayout = ({ insets='top', ...props }) => {
   const insetsConfig = useSafeAreaInsets();
 
   return (

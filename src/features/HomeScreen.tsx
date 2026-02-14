@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, FlatList, View, StyleSheet } from 'react-native';
+import { ScrollView, FlatList, View, StyleSheet, RefreshControl } from 'react-native';
 
 import { FeatureContainer, ReusableStyles } from '../components';
-import { injectQuery, odooApi } from '../common/store/reduxApi';
+import { emptyList, emptyObject, injectQuery, odooApi } from '../common/store/reduxApi';
 import { Text, List, Button, Card, Avatar, Searchbar, Icon, SegmentedButtons } from 'react-native-paper';
 import DebugView from '../components/DebugView';
 import { useSelector } from 'react-redux';
@@ -15,18 +15,10 @@ import { groupList } from '../common/utils/commonComponentLogic';
 import DataGrid from '../components/DataGrid';
 import CustomSearch from '../components/CustomSearch';
 import Pagination from '../components/Pagination';
+import AppHeader from '../components/AppHeader';
+import CartButton from '../components/CartButton';
+import CategoryBreadcrumb from '../components/CategoryBreadcrumb';
 
-const Item = ({ item }) => {
-  const rs = ReusableStyles
-  return (
-    <View style={rs.listItem}>
-      <View style={rs.containerRawSpaceBetween}>
-        <Text>{item.name}</Text>
-        {/* <Text>{JSON.stringify(item)}</Text> */}
-      </View>
-    </View>
-  )
-}
 
 export default ({ navigation, route }) => {
   return (
@@ -36,14 +28,16 @@ export default ({ navigation, route }) => {
   );
 };
 
+const initialEmptyCategory = {
+  id: 0,
+  display_name: '',
+  name: '',
+}
+
 function Categories() {
   const { useQuery } = injectQuery('product.category');
   // http://localhost:8017/shop/category/furnitures-2
-  const [selectedCategory, setSelectedCategory] = useState({
-    id: 0,
-    display_name: '',
-    name: '',
-  })
+  const [selectedCategory, setSelectedCategory] = useState(initialEmptyCategory)
   const shopQuery = odooApi.useShopQuery({
     selectedCategory,
   })
@@ -93,42 +87,68 @@ function CategoriesNew() {
 
   const productsList = productsHomeQuery.data?.products
   const pagination = productsHomeQuery.data?.pagination as PaginationData
+  const currentCategory = productsHomeQuery.data?.category ?? emptyObject
+  const category_breadcrumb_data = productsHomeQuery.data?.category?.parents_and_self ?? emptyList
   // const productsList = groupList(productsHomeQuery.data?.products)
+
+  function handleCategoryPressed(data) {
+    if (data) {
+      if (data.id === 'all') {
+        setSelectedCategory(initialEmptyCategory)
+      } else {
+        setSelectedCategory(data)
+      }
+    }
+  }
 
   return (
     <>
-      <CustomSearch
-        style={{
-          marginHorizontal: MARGIN_HORIZONTAL,
-          marginVertical: 8,
-        }}
-        handleSearch={term => setSearchTerm(term)}
-      />
-      <View
-        style={{ height: 50 }}
-      >
-        <FlatList
-          horizontal={true}
-          data={productsHomeQuery.data?.categories}
-          onRefresh={productsHomeQuery.refetch}
-          refreshing={productsHomeQuery.isFetching}
-          contentContainerStyle={{
-            height: 50,
-            // borderWidth: 1, borderColor: 'red',
+      <View style={{
+        flexDirection: 'row',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+        <CustomSearch
+          style={{
+            marginHorizontal: MARGIN_HORIZONTAL,
+            marginVertical: 8,
+            flex: 1,
           }}
-          renderItem={props =>
-            <View style={styles.categoryButtonContainer}>
-              <Button style={styles.categoryButton} key={props.item.id}
-                mode={selectedCategory.id === props.item.id ? 'contained' : 'outlined'}
-                onPress={() => setSelectedCategory(props.item)}
-              >{props.item.name}</Button>
-            </View>
-          }
+          handleSearch={term => setSearchTerm(term)}
+        />
+        <CartButton />
+      </View>
+      <View style={styles.tmpFixStyle}>
+        <CategoryBreadcrumb
+          data={category_breadcrumb_data} currentId={currentCategory?.id} onPress={handleCategoryPressed}
         />
       </View>
+      <FlatList
+        horizontal={true}
+        data={productsHomeQuery.data?.categories}
+        style={styles.tmpFixStyle}
+        // onRefresh={productsHomeQuery.refetch}
+        // refreshing={productsHomeQuery.isFetching}
+        contentContainerStyle={{
+          // flexGrow: 0,
+          // borderWidth: 1, borderColor: 'red',
+        }}
+        renderItem={props =>
+          <View style={styles.categoryButtonContainer}>
+            <Button style={styles.categoryButton} key={props.item.id}
+              mode={selectedCategory.id === props.item.id ? 'contained' : 'outlined'}
+              onPress={() => setSelectedCategory(props.item)}
+            >{props.item.name}</Button>
+          </View>
+        }
+      />
       {/* <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} /> */}
       <FlatList
         data={productsList}
+        // data={[]}
+        style={{
+          height: '100%',
+        }}
         onRefresh={productsHomeQuery.refetch}
         refreshing={productsHomeQuery.isFetching}
         contentContainerStyle={{
@@ -143,6 +163,15 @@ function CategoriesNew() {
             }} />
         }
       />
+      {/* TODO: show no data view when product length === 0 */}
+      {/* <ScrollView refreshControl={
+        <RefreshControl
+          onRefresh={productsHomeQuery.refetch}
+          refreshing={productsHomeQuery.isFetching}
+        />
+      }>
+        <Text>{JSON.stringify(productsHomeQuery.data, null, 2)}</Text>
+      </ScrollView> */}
       {/* {productsHomeQuery.data?.products?.length ? <ProductCard product={productsHomeQuery.data?.products[0]} productsHomeQuery={productsHomeQuery} /> : null} */}
       {pagination ? <Pagination page={page} setPage={setPage} totalLength={pagination.total_count} numberOfItemsPerPage={pagination.page_size} /> : null}
       {productsHomeQuery.error ?
@@ -265,6 +294,11 @@ const styles = StyleSheet.create({
   categoryButton: {
     marginHorizontal: 4,
     marginVertical: 4,
+  },
+  tmpFixStyle: {
+    minHeight: 50,
+    borderWidth: 1, borderColor: 'grey',
+    borderStyle: 'dashed',
   },
 });
 

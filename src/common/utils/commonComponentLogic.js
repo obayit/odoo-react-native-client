@@ -107,3 +107,13 @@ export function groupList(data_list, perGroup=2){
     }
     return groups
 }
+
+export function sumOfNumbers(data_list){
+  if(data_list === undefined || data_list === null){
+    return undefined
+  }
+  return data_list.reduce((howMuchSoFar,currentElementOfTheArray) => {
+    howMuchSoFar = howMuchSoFar + currentElementOfTheArray;
+    return howMuchSoFar;
+  });
+}

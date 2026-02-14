@@ -375,14 +375,14 @@ export default function ProductDetailsScreen({ navigation, route }) {
     <FeatureContainer loading={isLoading}>
       <ScrollView contentContainerStyle={styles.scrollViewContentContainer}>
         <View style={{ flexDirection: 'row' }}>
-          <Text style={styles.debugSubtleText}>productConfig: {JSON.stringify(productConfig, null, 2)}{'\n'}{JSON.stringify(variantDebugQuery.data)}</Text>
+          {/* <Text style={styles.debugSubtleText}>productConfig: {JSON.stringify(productConfig, null, 2)}{'\n'}{JSON.stringify(variantDebugQuery.data)}</Text> */}
           {/* <Text style={styles.debugSubtleText}>attrChecked: {JSON.stringify(attrChecked, null, 2)}</Text> */}
           {/* <Text style={styles.debugSubtleText}>combination: {JSON.stringify(stripHtmlDebug(combinationQuery.data), null, 2)}</Text> */}
           {/* <Text style={styles.debugSubtleText}>product_id: {combinationQuery.data?.product_id}</Text> */}
           {/* <Text style={styles.debugSubtleText}>extraPriceQuery: {JSON.stringify(extraPriceQuery.data, null, null)}</Text> */}
 
           {/* {combinationQuery.error ? <Text style={styles.debugSubtleText}>combinationError: {JSON.stringify(combinationQuery.error, null, 2)}</Text> : null} */}
-          <Text style={styles.debugSubtleText}>firstCombination: {JSON.stringify(getFirstCombinationQuery.data, null, 2)}</Text>
+          {/* <Text style={styles.debugSubtleText}>firstCombination: {JSON.stringify(getFirstCombinationQuery.data, null, 2)}</Text> */}
           {/* <Text style={styles.debugSubtleText}>_ptav: {JSON.stringify(stripHtmlDebug(combinationQuery.data?._ptav), null, 2)}</Text> */}
           {/* <Text style={styles.debugSubtleText}>_combination: {JSON.stringify(combinationQuery.data?._combination, null, 2)}</Text> */}
         </View>

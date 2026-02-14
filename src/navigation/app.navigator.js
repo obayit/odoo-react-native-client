@@ -31,7 +31,7 @@ const Stack = createStackNavigator();
 const useHeaderOptions = () => {
   return {
     options: {
-      headerShown: true,
+      headerShown: false,
       // headerTransparent: true,
       headerTitleAlign: 'center',
       headerTintColor: colors.color_primary_600,
@@ -71,7 +71,8 @@ const HomeNavigator = () => {
     tabBarIcon: (props) => tabBarIcon({name: 'star', ...props}),
   }
   const ordersOptions = {
-    tabBarIcon: (props) => tabBarIcon({name: 'star', ...props}),
+    tabBarIcon: (props) => tabBarIcon({name: 'sofa-single', ...props}),
+    title: 'My Orders',
   }
   const profileOptions = {
     tabBarIcon: (props) => tabBarIcon({name: 'account', ...props}),
@@ -80,7 +81,7 @@ const HomeNavigator = () => {
     <Tab.Navigator screenOptions={tabBarOptions}>
       {/* <Tab.Screen name='Menus' component={HomeScreen} options={homeOptions}/> */}
       <Tab.Screen name={ScreenNames.Home} component={HomeScreen} options={homeOptions}/>
-      <Tab.Screen name={ScreenNames.Products} component={Products} options={productsOptions}/>
+      {/* <Tab.Screen name={ScreenNames.Products} component={Products} options={productsOptions}/> */}
       {/* <Tab.Screen name='My Orders' component={OrdersList} options={ordersOptions}/> */}
       <Stack.Screen name={ScreenNames.MyOrders} component={MyOrdersScreen} options={ordersOptions} />
       {/* <Tab.Screen name='Select Model' component={SelectModel} options={selectModelOptions}/> */}

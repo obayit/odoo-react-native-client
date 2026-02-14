@@ -7,8 +7,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "lint": "eslint --fix --ext .js,.jsx .",
-    "postinstall": "node scripts/patch-cardcover-expo-image.js"
+    "lint": "eslint --fix --ext .js,.jsx ."
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
