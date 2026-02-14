@@ -2,7 +2,6 @@
   "expo": {
     "name": "odoo-client",
     "slug": "odoo-client",
-    "scheme": "odooclient",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
