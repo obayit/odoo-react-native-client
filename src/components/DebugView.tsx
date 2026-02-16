@@ -28,6 +28,7 @@ function DebugView() {
       // navigation.navigate(ScreenNames.EditProfile);
       // navigation.navigate(ScreenNames.Cart);
       // navigation.navigate(ScreenNames.MyOrders);
+      // navigation.navigate(ScreenNames.OrderDetails, { recordId: 42 })
     }, 500);
   }, [])
   return null

@@ -11,7 +11,7 @@ import { SectionHeader } from '../components/Utils';
 
 export default ({ navigation, route }) => {
   return (
-    <FeatureContainer>
+    <FeatureContainer insets='top'>
       <ProfileView />
     </FeatureContainer>
   );

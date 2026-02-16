@@ -3,7 +3,7 @@ import React from 'react';
 import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-export const SafeAreaLayout = ({ insets='top', ...props }) => {
+export const SafeAreaLayout = ({ insets='vertical', ...props }) => {
   const insetsConfig = useSafeAreaInsets();
 
   return (
@@ -12,8 +12,10 @@ export const SafeAreaLayout = ({ insets='top', ...props }) => {
       style={[
         props.style,
         {
-          paddingTop: insets === 'top' ? insetsConfig.top : 0,
-          paddingBottom: insets === 'bottom' ? insetsConfig.bottom : 0,
+          paddingTop: ['top', 'vertical'].includes(insets) ? insetsConfig.top : 0,
+          paddingBottom: ['bottom', 'vertical'].includes(insets) ? insetsConfig.bottom : 0,
+          paddingLeft: insetsConfig.left,
+          paddingRight: insetsConfig.right,
           height: '100%',
         },
       ]}

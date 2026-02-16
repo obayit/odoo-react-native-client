@@ -10,8 +10,8 @@ This is a managed expo project, run the following commands to start the developm
 <img alt="Login" src="docs/login.jpg" width="250"/>
 <img alt="Home" src="docs/home.jpg" width="250"/>
 <img alt="Product Details" src="docs/product.jpg" width="250"/>
-<img alt="Home" src="docs/home.jpg" width="250"/>
-<img alt="Home" src="docs/home.jpg" width="250"/>
+<img alt="Orders" src="docs/orders.jpg" width="250"/>
+<img alt="Checkout" src="docs/cart.jpg" width="250"/>
 <img alt="Dynamic List" src="docs/dynamic_list.jpg" width="250"/>
 
 ### Used libraries

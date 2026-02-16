@@ -30,13 +30,15 @@ export function displayDate(datetime){
     return formattedDate;
 }
 
-export function displayDateTime(datetime) {
+export function displayDateTime(datetime, options={}) {
+  const hideSeconds = options.hideSeconds
   if(!datetime){
     return ''
   }
   let formattedDate = datetime + ''
   try {
-    formattedDate = moment.utc(datetime).local().format("DD MMM YYYY hh:mm:ss A")
+    const pattern = hideSeconds ? "DD MMM YYYY hh:mm A" : "DD MMM YYYY hh:mm:ss A"
+    formattedDate = moment.utc(datetime).local().format(pattern)
   } catch { }
   return formattedDate
 }
@@ -117,3 +119,5 @@ export function sumOfNumbers(data_list){
     return howMuchSoFar;
   });
 }
+
+export const jsonCopy = (item) => JSON.parse(JSON.stringify(item))

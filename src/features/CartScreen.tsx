@@ -13,6 +13,7 @@ import colors from '../components/colors';
 import { CustomSpacer, SectionHeader } from '../components/Utils';
 import AmountText from '../components/AmountText';
 import { ScreenNames } from '../navigation/navigation.constants';
+import AmountLine from '../components/AmountLine';
 
 
 export default ({ route }) => {
@@ -67,34 +68,6 @@ export default ({ route }) => {
     </FeatureContainer>
   );
 };
-
-function AmountLine({ title, amount, currencyData }) {
-  let amountText = amount ?? 0
-  if (currencyData?.position && currencyData?.symbol) {
-    if (currencyData.position === 'after') {
-      amountText = `${amount} ${currencyData.symbol}`
-    } else {
-      amountText = `${amount} ${currencyData.symbol}`
-    }
-  }
-  return (
-    <View style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginTop: 8,
-      marginBottom: 8,
-    }}>
-      <Text>{title}</Text>
-      <View style={{
-        flex: 1,
-        marginHorizontal: 16,
-        borderBottomColor: colors.color_grey_600,
-        borderBottomWidth: 1,
-      }}/>
-      <Text>{amountText}</Text>
-    </View>
-  )
-}
 
 function OrderLine({ line, currencyData }) {
   const theme = useTheme()

@@ -19,7 +19,7 @@ import { CustomSpacer } from '../components/Utils';
 
 export default ({ navigation, route }) => {
   return (
-    <FeatureContainer>
+    <FeatureContainer insets='top'>
       <MyOrders />
     </FeatureContainer>
   );
@@ -76,12 +76,14 @@ function OrderCard({ order, ordersQuery, style = undefined }) {
     <Surface style={[{
       margin: 8,
       borderRadius: 16,
-      padding: 8,
+      padding: 16,
       // borderWidth: 1,
-      // borderColor: 'lime',
-    }, style]}>
+      // borderColor: 'purple',
+    }, style]}
+    >
       <TouchableOpacity onPress={handleNavigateToDetails}>
         <Text>{displayDateTime(order.date_order)}</Text>
+        <CustomSpacer height={8} />
         <Divider />
         <View style={{
           flexDirection: 'row',

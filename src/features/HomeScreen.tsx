@@ -11,18 +11,19 @@ import OdooImage, { useImageUrl } from '../components/OdooImage';
 import { useNavigation } from '@react-navigation/native';
 import { ScreenNames } from '../navigation/navigation.constants';
 import AmountText from '../components/AmountText';
-import { groupList } from '../common/utils/commonComponentLogic';
+import { groupList, jsonCopy } from '../common/utils/commonComponentLogic';
 import DataGrid from '../components/DataGrid';
 import CustomSearch from '../components/CustomSearch';
 import Pagination from '../components/Pagination';
 import AppHeader from '../components/AppHeader';
 import CartButton from '../components/CartButton';
 import CategoryBreadcrumb from '../components/CategoryBreadcrumb';
+import { CustomSpacer } from '../components/Utils';
 
 
 export default ({ navigation, route }) => {
   return (
-    <FeatureContainer>
+    <FeatureContainer insets='top'>
       <CategoriesNew />
     </FeatureContainer>
   );
@@ -34,48 +35,10 @@ const initialEmptyCategory = {
   name: '',
 }
 
-function Categories() {
-  const { useQuery } = injectQuery('product.category');
-  // http://localhost:8017/shop/category/furnitures-2
-  const [selectedCategory, setSelectedCategory] = useState(initialEmptyCategory)
-  const shopQuery = odooApi.useShopQuery({
-    selectedCategory,
-  })
-
-  return (
-    <>
-      <FlatList
-        horizontal={true}
-        data={shopQuery.data?.categories}
-        onRefresh={shopQuery.refetch}
-        refreshing={shopQuery.isFetching}
-        style={{ height: 50 }}
-        contentContainerStyle={{
-          height: 50,
-          // borderWidth: 1, borderColor: 'red',
-        }}
-        renderItem={props =>
-          <View style={styles.categoryButtonContainer}>
-            <Button style={styles.categoryButton} key={props.item.id}
-              mode={selectedCategory.id === props.item.id ? 'contained' : 'outlined'}
-              onPress={() => setSelectedCategory(props.item)}
-            >{props.item.display_name}</Button>
-          </View>
-        }
-      />
-      {shopQuery.error ? <Text>{JSON.stringify(shopQuery.error)}</Text> : null}
-      <ScrollView>
-        {selectedCategory?.id ? <Text>{JSON.stringify(shopQuery.data?.categories, null, 2)}</Text> : null}
-      </ScrollView>
-      <DebugView />
-    </>
-  )
-}
-
 function CategoriesNew() {
   const [selectedCategory, setSelectedCategory] = useState({
     id: 0,
-    display_name: '',
+    // display_name: '',
   })
   const [searchTerm, setSearchTerm] = React.useState('');
   const [page, setPage] = useState(0)
@@ -101,6 +64,20 @@ function CategoriesNew() {
     }
   }
 
+  const categories_list = currentCategory?.id ?
+  [
+    {
+      id: currentCategory.id,
+      name: 'Back',
+      is_special_back: true,
+    },
+    ...productsHomeQuery.data?.categories
+  ]
+    :
+    productsHomeQuery.data?.categories
+
+
+
   return (
     <>
       <View style={{
@@ -118,14 +95,14 @@ function CategoriesNew() {
         />
         <CartButton />
       </View>
-      <View style={styles.tmpFixStyle}>
+      {/* <View style={[styles.tmpFixStyle, { borderBottomWidth: 0 }]}>
         <CategoryBreadcrumb
           data={category_breadcrumb_data} currentId={currentCategory?.id} onPress={handleCategoryPressed}
         />
-      </View>
+      </View> */}
       <FlatList
         horizontal={true}
-        data={productsHomeQuery.data?.categories}
+        data={categories_list}
         style={styles.tmpFixStyle}
         // onRefresh={productsHomeQuery.refetch}
         // refreshing={productsHomeQuery.isFetching}
@@ -137,11 +114,28 @@ function CategoriesNew() {
           <View style={styles.categoryButtonContainer}>
             <Button style={styles.categoryButton} key={props.item.id}
               mode={selectedCategory.id === props.item.id ? 'contained' : 'outlined'}
-              onPress={() => setSelectedCategory(props.item)}
+              icon={props.item.is_special_back ? 'chevron-left' : undefined}
+              onPress={() => {
+                if(props.item.is_special_back){
+                  setSelectedCategory({
+                    id: Number(currentCategory.parent_id || 0),
+                  })
+                } else {
+                  setSelectedCategory(props.item)
+                }
+              }}
+              onLongPress={() => {
+                if(props.item.is_special_back){
+                  setSelectedCategory(initialEmptyCategory)
+                } else {
+                  setSelectedCategory(props.item)
+                }
+              }}
             >{props.item.name}</Button>
           </View>
         }
       />
+      <CustomSpacer height={10}/>
       {/* <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} /> */}
       <FlatList
         data={productsList}
@@ -174,16 +168,16 @@ function CategoriesNew() {
       </ScrollView> */}
       {/* {productsHomeQuery.data?.products?.length ? <ProductCard product={productsHomeQuery.data?.products[0]} productsHomeQuery={productsHomeQuery} /> : null} */}
       {pagination ? <Pagination page={page} setPage={setPage} totalLength={pagination.total_count} numberOfItemsPerPage={pagination.page_size} /> : null}
-      {productsHomeQuery.error ?
+      {/* {productsHomeQuery.error ?
         <ScrollView>
           <Text>{JSON.stringify(productsHomeQuery.error)}</Text>
           <Button onPress={productsHomeQuery.refetch} mode='outlined'>refetch</Button>
-        </ScrollView> : null}
-      {selectedCategory?.id ?
+        </ScrollView> : null} */}
+      {/* {selectedCategory?.id ?
         <ScrollView>
           <Text>{JSON.stringify(productsHomeQuery.data?.categories, null, 2)}</Text>
         </ScrollView>
-        : null}
+        : null} */}
       <DebugView />
     </>
   )
@@ -297,8 +291,8 @@ const styles = StyleSheet.create({
   },
   tmpFixStyle: {
     minHeight: 50,
-    borderWidth: 1, borderColor: 'grey',
-    borderStyle: 'dashed',
+    // borderWidth: 1, borderColor: 'grey',
+    // borderStyle: 'dashed',
   },
 });
 
