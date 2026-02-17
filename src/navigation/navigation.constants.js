@@ -7,4 +7,6 @@ export const ScreenNames = {
   Cart: 'Cart',
   OrderDetails: 'OrderDetails',
   MyOrders: 'MyOrders',
+  SignUp: 'SignUp',
+  login: 'Sign In',
 }

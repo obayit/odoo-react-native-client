@@ -34,6 +34,7 @@ export default function TextInputInner({ name, style, label, inputProps, onChang
           formField.onBlur();
           onBlurCallBack && onBlurCallBack(formField.value)
         }}
+        error={errors && errors[name]?.message}
         style={style ?? styles.input}
         {...inputProps}
       />

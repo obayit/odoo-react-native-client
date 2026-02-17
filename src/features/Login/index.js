@@ -20,6 +20,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { CustomSpacer } from '../../components/Utils';
 import { SettingsIcon } from '../../components/icons';
 import colors from '../../components/colors';
+import { Button } from 'react-native-paper';
+import { ScreenNames } from '../../navigation/navigation.constants';
 
 export const PersonIcon = (style) => (
   <MaterialCommunityIcons {...style} name='person' />
@@ -157,12 +159,13 @@ export default ({ navigation }) => {
           <View style={styles.settingsIconContainer}>
             <CustomButton onPress={() => setSettingsVisible(!settingsVisible)} icon={() => <SettingsIcon />} />
           </View>
+          <CustomSpacer height={8} />
           {settingsVisible ?
             <Animated.View
               key={'uniqueKey'}
               entering={FadeIn.duration(400)}
               exiting={FadeOut.duration(400)}
-              // exiting animation doesn't work, at least on debugging mode, maybe it will work in production
+            // exiting animation doesn't work, at least on debugging mode, maybe it will work in production
             >
               <TextInput name='base_url' label='URL' {...commonInputProps}
                 onChangeCallBack={updateUrl}
@@ -171,6 +174,7 @@ export default ({ navigation }) => {
                   accessoryRight: PersonIcon,
                   onSubmitEditing: () => passwordInput.current.focus(),
                 }} />
+              <CustomSpacer height={8} />
               <TextInput name='database' label='Database' {...commonInputProps}
                 onChangeCallBack={updateDatabase}
                 inputProps={{
@@ -178,7 +182,7 @@ export default ({ navigation }) => {
                   accessoryRight: PersonIcon,
                   onSubmitEditing: () => passwordInput.current.focus(),
                 }} />
-              <CustomSpacer height={40}/>
+              <CustomSpacer height={40} />
             </Animated.View>
             : null}
           <TextInput name='login' label='Login' {...commonInputProps}
@@ -191,6 +195,7 @@ export default ({ navigation }) => {
               autoCorrect: false,
             }} />
           {/* NOTE: see this to implement auto login on pressing enter, https://stackoverflow.com/a/35765465/3557761 */}
+          <CustomSpacer height={8}/>
           <TextInput name='password' label='Password' {...commonInputProps}
             inputProps={{
               ref: passwordInput,
@@ -204,7 +209,8 @@ export default ({ navigation }) => {
 
         </FormProvider>
         <DebugView />
-        <CustomButton disabled={isLoading} onPress={handleSubmit(onSignInButtonPress)} style={styles.submitButton} icon='login'>Login</CustomButton>
+        <Button mode='contained' disabled={isLoading} onPress={handleSubmit(onSignInButtonPress)} style={styles.submitButton} icon='login'>Login</Button>
+        <Button mode='outlined' disabled={isLoading} onPress={() => navigation.navigate(ScreenNames.SignUp)} style={styles.submitButton} >Signup</Button>
         {/* <CustomButton status='control' onPress={testAddError} style={styles.submitButton}>Test Error Modal</CustomButton>
         <CustomButton status='control' onPress={() => errorApi.addError('hi', { type: 'info' })} style={styles.submitButton}>Test Info Modal</CustomButton>
         <CustomButton status='control' onPress={() => errorApi.addError('hi', { type: 'success' })} style={styles.submitButton}>Test Success Modal</CustomButton>
@@ -231,7 +237,6 @@ const styles = StyleSheet.create({
   },
   submitButton: {
     marginTop: 10,
-    backgroundColor: colors.color_info_300,
   },
   scrollContainer: {
     margin: 16,

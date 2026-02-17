@@ -29,6 +29,7 @@ function DebugView() {
       // navigation.navigate(ScreenNames.Cart);
       // navigation.navigate(ScreenNames.MyOrders);
       // navigation.navigate(ScreenNames.OrderDetails, { recordId: 42 })
+      // navigation.navigate(ScreenNames.SignUp)
     }, 500);
   }, [])
   return null

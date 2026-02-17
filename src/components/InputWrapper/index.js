@@ -1,14 +1,16 @@
 import React from "react"
 import { View } from 'react-native'
+import { Text, useTheme } from "react-native-paper"
 
 export function InputWrapper({ name, childStyle, errors, children, style }) {
   // get the margins from the input's style
   const errorStyle = getMarginFromStyle(childStyle)
+  const theme = useTheme()
   return (
     <View style={style}>
       {children}
       {errors && errors[name] && (
-        <Text status="danger" style={errorStyle}>
+        <Text style={[errorStyle, { color: theme.colors.error}]}>
           {errors[name]?.message}
         </Text>
       )}

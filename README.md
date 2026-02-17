@@ -49,3 +49,4 @@ That is because an incompatible version of react-native-svg is installed, see th
 ### Known Issues ⚠️
 * SelectionInput (aka Dropdown)
   - first tab doesn't open the options menu!
+* if session expired, the app doesn't logout automatically (of course only public info is accessible)

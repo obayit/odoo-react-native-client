@@ -95,6 +95,9 @@ export function getRtkErrorMessage(error){
     if(error?.error){
         return error?.error
     }
+    if(error?.data?.message){
+        return error?.data?.message
+    }
     if (error) {
         return error + ''
     }

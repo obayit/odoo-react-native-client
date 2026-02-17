@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, FlatList, View, StyleSheet, TouchableOpacity } from 'react-native';
+import { ScrollView, FlatList, View, StyleSheet, TouchableOpacity, Image } from 'react-native';
 
 import { FeatureContainer, ReusableStyles } from '../components';
 import { injectQuery, odooApi } from '../common/store/reduxApi';
@@ -34,12 +34,27 @@ function MyOrders() {
   const orders = ordersQuery.data?.orders_data?.orders
   const pagination = ordersQuery.data?.pagination as PaginationData
 
+  if (ordersQuery.data?.orders_data?.orders?.length === 0) {
+    return (
+      <View style={{
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+        <Image
+          source={require('../../assets/no-data-nobg.png')}
+          style={styles.emptyDataImage}
+          resizeMode='contain'
+        />
+      </View>
+    )
+  }
+
   return (
     <>
       <FlatList
         data={orders}
         onRefresh={ordersQuery.refetch}
-        refreshing={ordersQuery.isFetching}
+        refreshing={ordersQuery.isFetching || ordersQuery.isLoading}
         contentContainerStyle={{
           // borderWidth: 1, borderColor: 'green'
         }}
@@ -104,6 +119,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
     marginVertical: 4,
   },
+  emptyDataImage: {
+    height: 400,
+    width: '100%',
+    margin: 16,
+  }
 });
 
 const MARGIN_HORIZONTAL = 8

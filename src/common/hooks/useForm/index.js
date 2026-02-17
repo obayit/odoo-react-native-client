@@ -25,6 +25,10 @@ const fieldBuilder = field => {
       res = res.required();
     }
   }
+  if (field.is_email) {
+    res = res.email();
+  }
+  return res
 }
 export default (fields, options) => {
   options = options ? options : {};

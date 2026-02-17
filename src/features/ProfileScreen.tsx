@@ -8,6 +8,8 @@ import { useNavigation } from '@react-navigation/native';
 import { ScreenNames } from '../navigation/navigation.constants';
 import { IconSource } from 'react-native-paper/lib/typescript/components/Icon';
 import { SectionHeader } from '../components/Utils';
+import colors from '../components/colors';
+import useLogout from '../hooks/useLogout';
 
 export default ({ navigation, route }) => {
   return (
@@ -21,6 +23,7 @@ function ProfileView() {
   const profileQuery = odooApi.useProfileQuery({})
   const profile = profileQuery.data ?? emptyObject
   const navigation = useNavigation()
+  const logoutHook = useLogout()
   return (
     <ScrollView refreshControl={<RefreshControl onRefresh={profileQuery.refetch} refreshing={profileQuery.isFetching} />}
       contentContainerStyle={{
@@ -76,9 +79,27 @@ function ProfileView() {
         </>
         : null}
       {/* <DebugView /> */}
-      <Button mode='outlined' onPress={() => navigation.navigate(ScreenNames.EditProfile)}
-        icon='pencil'
-      >Edit</Button>
+      <View style={{
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+      }}>
+        <Button mode='outlined' onPress={() => navigation.navigate(ScreenNames.EditProfile)}
+          icon='pencil'
+        >Edit</Button>
+      </View>
+      <View style={{
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+        marginVertical: 16,
+      }}>
+        <Button mode='outlined' onPress={logoutHook.logout}
+          style={{
+            borderColor: colors.color_danger_600,
+          }}
+          icon='logout'
+          textColor={colors.color_danger_600}
+        >Logout</Button>
+      </View>
     </ScrollView>
   )
 }
@@ -89,7 +110,7 @@ type AccountDetailProps = {
   icon?: IconSource
 }
 
-function AccountDetail({ value, label, icon='information-variant-circle' }: AccountDetailProps) {
+function AccountDetail({ value, label, icon = 'information-variant-circle' }: AccountDetailProps) {
   if (value) {
     return <List.Item
       title={value}

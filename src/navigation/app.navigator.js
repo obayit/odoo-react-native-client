@@ -23,6 +23,7 @@ import EditProfileScreen from '../features/EditProfileScreen';
 import CartScreen from '../features/CartScreen';
 import MyOrdersScreen from '../features/MyOrdersScreen';
 import OrderDetailsScreen from '../features/OrderDetailsScreen';
+import SignUpScreen from '../features/SignUpScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -55,8 +56,8 @@ const HomeNavigator = () => {
     <MaterialCommunityIcons name={name} color={color} size={size} />
   );
   const homeOptions = {
-    title: 'Home',
-    tabBarIcon: (props) => tabBarIcon({name: 'home', ...props}),
+    title: 'Shop',
+    tabBarIcon: (props) => tabBarIcon({name: 'sofa-single', ...props}),
   }
   const productsOptions = {
     title: 'Products',
@@ -71,7 +72,7 @@ const HomeNavigator = () => {
     tabBarIcon: (props) => tabBarIcon({name: 'star', ...props}),
   }
   const ordersOptions = {
-    tabBarIcon: (props) => tabBarIcon({name: 'sofa-single', ...props}),
+    tabBarIcon: (props) => tabBarIcon({name: 'menu', ...props}),
     title: 'My Orders',
   }
   const profileOptions = {
@@ -105,7 +106,8 @@ const AuthNavigator = () => {
   const commonHeaderOptions = useHeaderOptions();
   return(
   <Stack.Navigator screenOptions={commonHeaderOptions.options}>
-    <Stack.Screen name='Sign In' component={Login} options={{headerShown: true}}/>
+    <Stack.Screen name={ScreenNames.login} component={Login} />
+    <Stack.Screen name={ScreenNames.SignUp} component={SignUpScreen} />
   </Stack.Navigator>
 );
 }

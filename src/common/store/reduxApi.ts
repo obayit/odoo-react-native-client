@@ -221,6 +221,13 @@ export const odooApi = createApi({
       //   return response;
       // },
     }),
+    signup: builder.mutation({
+      query: (data) => {
+        return (baseOdooRequest({
+        url: '/obi_app/signup',
+        params: data,
+      }))},
+    }),
     updateCart: builder.mutation({
       query: (args) => (baseOdooRequest({
         url: '/shop/cart/update_json',

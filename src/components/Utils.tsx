@@ -1,5 +1,6 @@
 import { View } from 'react-native'
-import { Divider, Text } from 'react-native-paper'
+import { Divider, Icon, IconButton, Text } from 'react-native-paper'
+import { Insets } from 'react-native/types_generated/index'
 
 export function CustomSpacer({ height = 16, width = '100%' }) {
   return <View style={{ height, width }} />
@@ -18,4 +19,11 @@ export function SectionHeader({ title }) {
       <Divider />
     </View>
   )
+}
+
+export const hitSlop16: Insets = {
+  top: 16,
+  bottom: 16,
+  left: 16,
+  right: 16,
 }

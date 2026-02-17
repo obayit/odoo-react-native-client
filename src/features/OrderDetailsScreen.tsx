@@ -19,11 +19,13 @@ import { CustomSpacer } from '../components/Utils';
 import AmountLine from '../components/AmountLine';
 import ContactWidget from '../components/ContactWidget';
 import ShippingSection from '../components/ShippingSection';
+import AppHeader from '../components/AppHeader';
 
 export default ({ navigation, route }) => {
   const recordId = route.params.recordId
   return (
     <FeatureContainer>
+      <AppHeader />
       <Order recordId={recordId} />
     </FeatureContainer>
   );
