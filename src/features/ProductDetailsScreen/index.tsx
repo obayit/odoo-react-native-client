@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Text, FlatList, View, StyleSheet, ScrollView, TouchableOpacity, ViewStyle } from 'react-native';
 import { SegmentedButtons, Button, Checkbox, Chip, Divider, Icon, Menu, RadioButton, Surface, TextInput, TouchableRipple, useTheme } from 'react-native-paper';
 import { Dropdown, DropdownItemProps, Option as DropDownOption } from 'react-native-paper-dropdown';
@@ -45,6 +45,7 @@ export default function ProductDetailsScreen({ navigation, route }) {
   // const [combinationParams, setCombinationParams] = useState<any>({})
   const [firstCombinationParams, setFirstCombinationParams] = useState<any>({})
   const [debugText, setDebugText] = useState<any>({})
+  const theme = useTheme()
 
   const { record, query } = useSingleRecord({
     model: 'product.template',
@@ -76,7 +77,7 @@ export default function ProductDetailsScreen({ navigation, route }) {
   })
   // const [combinationQueryFn, combinationQuery] = odooApi.useLazyGetCombinationInfoQuery()
   const combinationQueryFn = () => { throw 'unimplemented combinationQueryFn' }
-  function getProductId(){
+  function getProductId() {
     // todo: review this, we need to save the product_id somewhere that can be used as a parameter for combinationQuery, but we get it from there too, so, how to do this without creating an infinite loop of change
     return combinationQuery?.data?.product_id ?? 0
   }
@@ -412,8 +413,10 @@ export default function ProductDetailsScreen({ navigation, route }) {
         <ProductPrice record={record} combinationQuery={combinationQuery} />
         <ProductTemplateAttributes record={record} productConfig={productConfig} setProductConfig={setProductConfig} combinationQuery={combinationQuery} extraPriceQuery={extraPriceQuery} />
         <View style={{ height: 10 }} />
-        <AddToCart record={record} productConfig={productConfig} setProductConfig={setProductConfig} combinationQuery={combinationQuery} />
-        <CustomSpacer height={100}/>
+        { combinationQuery.data?.product_id ?
+          <AddToCart record={record} productConfig={productConfig} setProductConfig={setProductConfig} combinationQuery={combinationQuery} />
+        : <Text style={{color: theme.colors.error}}>Combination not possible</Text> }
+        <CustomSpacer height={100} />
         {/* <DebugView/> headersMap*/}
       </ScrollView>
     </FeatureContainer>
@@ -735,7 +738,7 @@ function AddToCart({ record, productConfig, setProductConfig, combinationQuery }
     } else if (value === 'add') {
       newValue = makeDiff(1)
     }
-    if(newValue !== undefined){
+    if (newValue !== undefined) {
       setProductConfig(prev => ({
         ...prev,
         qty: newValue,
@@ -788,8 +791,8 @@ function AddToCart({ record, productConfig, setProductConfig, combinationQuery }
         ]}
       />
       <Button mode='contained' style={styles.addToCartButton} onPress={handleAddAsync}
-      icon='cart'
-      loading={updateCartQuery.isLoading}
+        icon='cart'
+        loading={updateCartQuery.isLoading}
       >Add to Cart</Button>
     </View>
   )

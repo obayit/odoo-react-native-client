@@ -59,3 +59,4 @@ That is because an incompatible version of react-native-svg is installed, see th
 * if session expired, the app doesn't logout automatically (of course only public info is accessible)
 * missing cart pagination (if cart items are too many)
 * missing attribute pagination (if attribute values are too many)
+* Dropdown's attribute label is gittery (animated on rerender)
