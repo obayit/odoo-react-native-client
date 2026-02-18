@@ -123,42 +123,50 @@ function CategoriesNew() {
           data={category_breadcrumb_data} currentId={currentCategory?.id} onPress={handleCategoryPressed}
         />
       </View> */}
-      <FlatList
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        data={categories_list}
-        style={styles.tmpFixStyle}
-        // onRefresh={productsHomeQuery.refetch}
-        // refreshing={productsHomeQuery.isFetching}
-        contentContainerStyle={{
-          // flexGrow: 0,
-          // borderWidth: 1, borderColor: 'red',
-        }}
-        renderItem={props =>
-          <View style={styles.categoryButtonContainer}>
-            <Button style={styles.categoryButton} key={props.item.id}
-              mode={selectedCategory.id === props.item.id ? 'contained' : 'outlined'}
-              icon={props.item.is_special_back ? 'chevron-left' : undefined}
-              onPress={() => {
-                if (props.item.is_special_back) {
-                  setSelectedCategory({
-                    id: Number(currentCategory.parent_id || 0),
-                  })
-                } else {
-                  setSelectedCategory(props.item)
-                }
-              }}
-              onLongPress={() => {
-                if (props.item.is_special_back) {
-                  setSelectedCategory(initialEmptyCategory)
-                } else {
-                  setSelectedCategory(props.item)
-                }
-              }}
-            >{props.item.name}</Button>
-          </View>
-        }
-      />
+      {categories_list?.length === 1 ?
+        // why this? because when the only button is the back button in the FlatList/ScrollView, it doesn't render unless the view is touched, idkw
+        <View style={[styles.tmpFixStyle, {flexDirection: 'row'}]}>
+          <CategoryButton
+            item={categories_list[0]}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            currentCategory={currentCategory}
+            key={
+              categories_list[0].is_special_back ?
+                `back.${categories_list[0].id}.${Math.random()}`
+                : categories_list[0].id
+            }
+          />
+        </View>
+        :
+        <ScrollView
+          horizontal={true}
+          showsHorizontalScrollIndicator={false}
+          // data={categories_list}
+          style={styles.tmpFixStyle}
+          // onRefresh={productsHomeQuery.refetch}
+          // refreshing={productsHomeQuery.isFetching}
+          contentContainerStyle={{
+            // flexGrow: 0,
+            // borderWidth: 1, borderColor: 'red',
+          }}
+          >{categories_list.map(item =>
+            <CategoryButton
+              item={item}
+              selectedCategory={selectedCategory}
+              setSelectedCategory={setSelectedCategory}
+              currentCategory={currentCategory}
+              key={
+                item.is_special_back ?
+                  `back.${item.id}.${Math.random()}`
+                  : item.id
+              }
+            />
+          )
+          }
+        </ScrollView>
+      }
+      {/* <Text>{JSON.stringify(categories_list)}</Text> */}
       <CustomSpacer height={10} />
       {/* <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} /> */}
       {searchIsEmpty ?
@@ -212,6 +220,32 @@ function CategoriesNew() {
       <DebugView />
     </>
   )
+}
+
+function CategoryButton({ selectedCategory, item, setSelectedCategory, currentCategory }) {
+  return (
+    <Button style={styles.categoryButton}
+      mode={selectedCategory.id === item.id ? 'contained' : 'outlined'}
+      icon={item.is_special_back ? 'chevron-left' : undefined}
+      onPress={() => {
+        if (item.is_special_back) {
+          setSelectedCategory({
+            id: Number(currentCategory.parent_id || 0),
+          })
+        } else {
+          setSelectedCategory(item)
+        }
+      }}
+      onLongPress={() => {
+        if (item.is_special_back) {
+          setSelectedCategory(initialEmptyCategory)
+        } else {
+          setSelectedCategory(item)
+        }
+      }}
+    >{item.name}</Button>
+  )
+
 }
 
 function EmptyShopSearch() {
@@ -337,7 +371,7 @@ const styles = StyleSheet.create({
   },
   tmpFixStyle: {
     minHeight: 50,
-    maxHeight: 100,
+    maxHeight: 50,
     // borderWidth: 1, borderColor: 'grey',
     // borderStyle: 'dashed',
   },
