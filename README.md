@@ -4,7 +4,14 @@ This project is still in the early development stage, and major changes will be 
 ## ⚠️ This app depends on a Odoo module found here: https://github.com/obayit/obi-app-api
 
 ## How to run
+
+### Step 1:
+Configure your database and URL by creating a `.env` file, you can copy `.env.example` with the command `cp .env.example .env` then change the values to match your DB and URL.
+Later, to change values of DB and URL, also clear expo cache by adding the `-c` to the expo start command below.
+
+### Step 2:
 This is a managed expo project, run the following commands to start the development: `npm install`, then`npx expo start`
+
 
 ## Screenshots
 <img alt="Login" src="docs/login.jpg" width="250"/>

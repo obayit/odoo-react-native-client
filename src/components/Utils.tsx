@@ -27,3 +27,8 @@ export const hitSlop16: Insets = {
   left: 16,
   right: 16,
 }
+
+export type PaginationData = {
+  page_size: number
+  page_count: number
+}

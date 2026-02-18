@@ -187,7 +187,7 @@ export default ({ navigation }) => {
           formMethods.setValue(fieldConfirmPassword.name, '1234567890abcd')
         }} style={styles.submitButton}>Autofill</Button> */}
         {/* <Text>{JSON.stringify(formMethods.formState.errors)}</Text> */}
-        <Text>d={JSON.stringify(signupQuery.data)}</Text>
+        {/* <Text>d={JSON.stringify(signupQuery.data)}</Text> */}
       </ScrollView>
     </FeatureContainer>
   );

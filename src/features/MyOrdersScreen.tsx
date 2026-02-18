@@ -15,7 +15,7 @@ import { displayDate, displayDateTime, groupList } from '../common/utils/commonC
 import DataGrid from '../components/DataGrid';
 import CustomSearch from '../components/CustomSearch';
 import Pagination from '../components/Pagination';
-import { CustomSpacer } from '../components/Utils';
+import { CustomSpacer, PaginationData } from '../components/Utils';
 
 export default ({ navigation, route }) => {
   return (
@@ -32,7 +32,11 @@ function MyOrders() {
   })
 
   const orders = ordersQuery.data?.orders_data?.orders
-  const pagination = ordersQuery.data?.pagination as PaginationData
+  const pagination = ordersQuery.data?.orders_data?.pager ? {
+    page_size: ordersQuery.data?.orders_data?.ppg,
+    page_count: ordersQuery.data?.orders_data?.pager.page_count,
+  } as PaginationData
+  : undefined
 
   if (ordersQuery.data?.orders_data?.orders?.length === 0) {
     return (
@@ -66,7 +70,8 @@ function MyOrders() {
             }} />
         }
       />
-      {pagination ? <Pagination page={page} setPage={setPage} totalLength={pagination.total_count} numberOfItemsPerPage={pagination.page_size} /> : null}
+      {pagination ? <Pagination page={page} setPage={setPage} pageCount={pagination.page_count} numberOfItemsPerPage={pagination.page_size} /> : null}
+      {/* <Text>{JSON.stringify(ordersQuery.data, null, 2)}</Text> */}
       {/* {ordersQuery.error ?
         <ScrollView>
           <Text>{JSON.stringify(ordersQuery.data, null, 2)}</Text>
@@ -123,16 +128,7 @@ const styles = StyleSheet.create({
     height: 400,
     width: '100%',
     margin: 16,
-  }
+  },
 });
 
 const MARGIN_HORIZONTAL = 8
-
-type PaginationData = {
-  current_page: number
-  total_pages: number
-  page_size: number
-  total_count: number
-  has_next: Boolean
-  has_prev: Boolean
-}

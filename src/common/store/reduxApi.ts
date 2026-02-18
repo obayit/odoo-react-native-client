@@ -294,14 +294,12 @@ export const odooApi = createApi({
     }),
     shop: builder.query({
       query: (arg) => ({
-        url: composeShopUrl(arg),
+        url: '/obi_app/shop',
         method: 'POST',
         body: {
           jsonrpc: "2.0",
           method: "call",
-          params: {
-            // categoryId: arg.selectedCategory.id,
-          },
+          params: arg,
         }
       }),
     }),

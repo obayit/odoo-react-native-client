@@ -10,11 +10,9 @@ type Props = {
   setPage: (value: number) => void
 }
 
-const Pagination = ({ totalLength, numberOfItemsPerPage = 80, page, setPage }) => {
+const Pagination = ({ pageCount, numberOfItemsPerPage = 80, page, setPage }) => {
   // const [page, setPage] = React.useState(0);
   // const [numberOfItemsPerPage, onItemsPerPageChange] = React.useState(numberOfItemsPerPageList[0]);
-  const from = page * numberOfItemsPerPage;
-  const to = Math.min((page + 1) * numberOfItemsPerPage, totalLength);
 
   React.useEffect(() => {
     setPage(0);
@@ -23,9 +21,9 @@ const Pagination = ({ totalLength, numberOfItemsPerPage = 80, page, setPage }) =
   return (
     <DataTable.Pagination
       page={page}
-      numberOfPages={Math.ceil(totalLength / numberOfItemsPerPage)}
+      numberOfPages={pageCount}
       onPageChange={page => setPage(page)}
-      label={`${from + 1}-${to} of ${totalLength}`}
+      label={`Page ${page+1} of ${pageCount}`}
       showFastPaginationControls
       // numberOfItemsPerPageList={numberOfItemsPerPageList}
       numberOfItemsPerPage={numberOfItemsPerPage}

@@ -151,9 +151,14 @@ export default ({ navigation }) => {
 
   return (
     <FeatureContainer loading={isLoading}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
+      <View
+        style={styles.container}
       >
+        <Image
+          style={styles.logo}
+          source={require('../../../assets/furnish-logo-nobg.png')}
+          resizeMode='contain'
+        />
         <FormProvider {...formMethods}>
 
           <View style={styles.settingsIconContainer}>
@@ -173,6 +178,7 @@ export default ({ navigation }) => {
                   autoCapitalize: 'none',
                   accessoryRight: PersonIcon,
                   onSubmitEditing: () => passwordInput.current.focus(),
+                  disabled: true,  /* this still doesn't work right, change to your database from the redux initial state code */
                 }} />
               <CustomSpacer height={8} />
               <TextInput name='database' label='Database' {...commonInputProps}
@@ -181,6 +187,7 @@ export default ({ navigation }) => {
                   autoCapitalize: 'none',
                   accessoryRight: PersonIcon,
                   onSubmitEditing: () => passwordInput.current.focus(),
+                  disabled: true,  /* this still doesn't work right, change to your database from the redux initial state code */
                 }} />
               <CustomSpacer height={40} />
             </Animated.View>
@@ -195,7 +202,7 @@ export default ({ navigation }) => {
               autoCorrect: false,
             }} />
           {/* NOTE: see this to implement auto login on pressing enter, https://stackoverflow.com/a/35765465/3557761 */}
-          <CustomSpacer height={8}/>
+          <CustomSpacer height={8} />
           <TextInput name='password' label='Password' {...commonInputProps}
             inputProps={{
               ref: passwordInput,
@@ -216,7 +223,7 @@ export default ({ navigation }) => {
         <CustomButton status='control' onPress={() => errorApi.addError('hi', { type: 'success' })} style={styles.submitButton}>Test Success Modal</CustomButton>
         <CustomButton status='control' onPress={() => errorApi.addError('hi', { type: 'danger' })} style={styles.submitButton}>Test Danger Modal</CustomButton>
         <CustomButton status='control' onPress={errorApi.removeError} style={styles.submitButton}>remove errors</CustomButton> */}
-      </ScrollView>
+      </View>
     </FeatureContainer>
   );
 };
@@ -238,11 +245,17 @@ const styles = StyleSheet.create({
   submitButton: {
     marginTop: 10,
   },
-  scrollContainer: {
+  container: {
+    flex: 1,
+    justifyContent: 'center',
     margin: 16,
   },
   settingsIconContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
+  },
+  logo: {
+    height: 200,
+    width: '100%',
   },
 });

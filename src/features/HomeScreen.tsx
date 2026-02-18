@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, FlatList, View, StyleSheet, RefreshControl } from 'react-native';
+import { ScrollView, FlatList, View, StyleSheet, RefreshControl, Image } from 'react-native';
 
 import { FeatureContainer, ReusableStyles } from '../components';
 import { emptyList, emptyObject, injectQuery, odooApi } from '../common/store/reduxApi';
@@ -18,7 +18,7 @@ import Pagination from '../components/Pagination';
 import AppHeader from '../components/AppHeader';
 import CartButton from '../components/CartButton';
 import CategoryBreadcrumb from '../components/CategoryBreadcrumb';
-import { CustomSpacer } from '../components/Utils';
+import { CustomSpacer, PaginationData } from '../components/Utils';
 
 
 export default ({ navigation, route }) => {
@@ -31,25 +31,35 @@ export default ({ navigation, route }) => {
 
 const initialEmptyCategory = {
   id: 0,
-  display_name: '',
-  name: '',
+  // display_name: '',
+  // name: '',
 }
 
 function CategoriesNew() {
-  const [selectedCategory, setSelectedCategory] = useState({
-    id: 0,
-    // display_name: '',
-  })
+  const [selectedCategory, setSelectedCategory] = useState(initialEmptyCategory)
   const [searchTerm, setSearchTerm] = React.useState('');
   const [page, setPage] = useState(0)
-  const productsHomeQuery = odooApi.useProductsHomeQuery({
-    selectedCategory,
+  const productsHomeQuery = odooApi.useShopQuery({
+    category: selectedCategory?.id,
     search: searchTerm,
     page: page + 1,
+
+    // selectedCategory,
+    // search: searchTerm,
+    // page: page + 1,
   })
+  // const shopQuery = odooApi.useShopQuery({
+  //   // category: selectedCategory?.id,
+  //   page: 2,
+  // })
 
   const productsList = productsHomeQuery.data?.products
-  const pagination = productsHomeQuery.data?.pagination as PaginationData
+  const searchIsEmpty = productsHomeQuery.data?.products?.length === 0
+  const pagination = productsHomeQuery.data?.pager ? {
+    page_size: productsHomeQuery.data?.ppg,
+    page_count: productsHomeQuery.data?.pager.page_count,
+  } as PaginationData
+    : undefined
   const currentCategory = productsHomeQuery.data?.category ?? emptyObject
   const category_breadcrumb_data = productsHomeQuery.data?.category?.parents_and_self ?? emptyList
   // const productsList = groupList(productsHomeQuery.data?.products)
@@ -65,19 +75,32 @@ function CategoriesNew() {
   }
 
   const categories_list = currentCategory?.id ?
-  [
-    {
-      id: currentCategory.id,
-      name: 'Back',
-      is_special_back: true,
-    },
-    ...productsHomeQuery.data?.categories
-  ]
+    [
+      {
+        id: currentCategory.id,
+        name: 'Back',
+        is_special_back: true,
+      },
+      ...productsHomeQuery.data?.categories
+    ]
     :
     productsHomeQuery.data?.categories
 
 
 
+  // return <ScrollView contentContainerStyle={{
+  //   flexDirection: 'row',
+  // }}
+  //   refreshControl={<RefreshControl onRefresh={() => {
+  //     // shopQuery.refetch()
+  //     productsHomeQuery.refetch()
+  //   }} refreshing={productsHomeQuery.isLoading || productsHomeQuery.isFetching
+  //     // || shopQuery.isFetching || shopQuery.isLoading
+  //   } />}
+  // >
+  //   <Text style={{ width: '50%' }}>{JSON.stringify(sort_obj(productsHomeQuery.data), null, 2)}</Text>
+  //   {/* <Text style={{ width: '50%' }}>{JSON.stringify(sort_obj(shopQuery.data.products), null, 2)}</Text> */}
+  // </ScrollView>
   return (
     <>
       <View style={{
@@ -102,6 +125,7 @@ function CategoriesNew() {
       </View> */}
       <FlatList
         horizontal={true}
+        showsHorizontalScrollIndicator={false}
         data={categories_list}
         style={styles.tmpFixStyle}
         // onRefresh={productsHomeQuery.refetch}
@@ -116,7 +140,7 @@ function CategoriesNew() {
               mode={selectedCategory.id === props.item.id ? 'contained' : 'outlined'}
               icon={props.item.is_special_back ? 'chevron-left' : undefined}
               onPress={() => {
-                if(props.item.is_special_back){
+                if (props.item.is_special_back) {
                   setSelectedCategory({
                     id: Number(currentCategory.parent_id || 0),
                   })
@@ -125,7 +149,7 @@ function CategoriesNew() {
                 }
               }}
               onLongPress={() => {
-                if(props.item.is_special_back){
+                if (props.item.is_special_back) {
                   setSelectedCategory(initialEmptyCategory)
                 } else {
                   setSelectedCategory(props.item)
@@ -135,28 +159,35 @@ function CategoriesNew() {
           </View>
         }
       />
-      <CustomSpacer height={10}/>
+      <CustomSpacer height={10} />
       {/* <Search searchTerm={searchTerm} setSearchTerm={setSearchTerm} /> */}
-      <FlatList
-        data={productsList}
-        // data={[]}
-        style={{
-          height: '100%',
-        }}
-        onRefresh={productsHomeQuery.refetch}
-        refreshing={productsHomeQuery.isFetching}
-        contentContainerStyle={{
-          // borderWidth: 1, borderColor: 'green'
-        }}
-        numColumns={2}
-        renderItem={props =>
-          // <ProductCardDouble products={props.item} productsHomeQuery={productsHomeQuery} />
-          <ProductCard product={props.item} productsHomeQuery={productsHomeQuery}
+      {searchIsEmpty ?
+        <EmptyShopSearch />
+        :
+        <>
+          <FlatList
+            data={productsList}
+            // data={[]}
             style={{
-              flex: 1,
-            }} />
-        }
-      />
+              height: '100%',
+            }}
+            onRefresh={productsHomeQuery.refetch}
+            refreshing={productsHomeQuery.isFetching}
+            contentContainerStyle={{
+              // borderWidth: 1, borderColor: 'green'
+            }}
+            numColumns={2}
+            renderItem={props =>
+              // <ProductCardDouble products={props.item} productsHomeQuery={productsHomeQuery} />
+              <ProductCard product={props.item} productsHomeQuery={productsHomeQuery}
+                style={{
+                  flex: 1,
+                }} />
+            }
+          />
+          {pagination ? <Pagination page={page} setPage={setPage} pageCount={pagination.page_count} numberOfItemsPerPage={pagination.page_size} /> : null}
+        </>
+      }
       {/* TODO: show no data view when product length === 0 */}
       {/* <ScrollView refreshControl={
         <RefreshControl
@@ -167,7 +198,7 @@ function CategoriesNew() {
         <Text>{JSON.stringify(productsHomeQuery.data, null, 2)}</Text>
       </ScrollView> */}
       {/* {productsHomeQuery.data?.products?.length ? <ProductCard product={productsHomeQuery.data?.products[0]} productsHomeQuery={productsHomeQuery} /> : null} */}
-      {pagination ? <Pagination page={page} setPage={setPage} totalLength={pagination.total_count} numberOfItemsPerPage={pagination.page_size} /> : null}
+      {/* <Text>{JSON.stringify(pagination, null, 2)}</Text> */}
       {/* {productsHomeQuery.error ?
         <ScrollView>
           <Text>{JSON.stringify(productsHomeQuery.error)}</Text>
@@ -180,6 +211,21 @@ function CategoriesNew() {
         : null} */}
       <DebugView />
     </>
+  )
+}
+
+function EmptyShopSearch() {
+  return (
+    <View style={{
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}>
+      <Image
+        source={require('../../assets/empty-search.png')}
+        style={styles.emptyDataImage}
+        resizeMode='contain'
+      />
+    </View>
   )
 }
 
@@ -291,8 +337,14 @@ const styles = StyleSheet.create({
   },
   tmpFixStyle: {
     minHeight: 50,
+    maxHeight: 100,
     // borderWidth: 1, borderColor: 'grey',
     // borderStyle: 'dashed',
+  },
+  emptyDataImage: {
+    height: 400,
+    width: '100%',
+    margin: 16,
   },
 });
 
@@ -652,11 +704,18 @@ const meh2 = [
 
 const MARGIN_HORIZONTAL = 8
 
-type PaginationData = {
-  current_page: number
-  total_pages: number
-  page_size: number
-  total_count: number
-  has_next: Boolean
-  has_prev: Boolean
+// Source - https://stackoverflow.com/a/49702242
+// Posted by mac
+// Retrieved 2026-02-17, License - CC BY-SA 3.0
+
+function sort_obj(not_sorted) {
+  if (!not_sorted) {
+    return ''
+  }
+  return Object.keys(not_sorted)
+    .sort()
+    .reduce(function (acc, key) {
+      acc[key] = not_sorted[key];
+      return acc;
+    }, {});
 }

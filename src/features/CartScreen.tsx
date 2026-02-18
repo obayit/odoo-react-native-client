@@ -17,8 +17,7 @@ import AmountLine from '../components/AmountLine';
 
 
 export default ({ route }) => {
-  const dispatch = useDispatch();
-  const profileQuery = odooApi.useProfileQuery({});
+  const [loading, setLoading] = useState(false)
   const cartQuery = odooApi.useCartQuery({});
   const cart = cartQuery.data?.cart_data ?? emptyObject;
   const navigation = useNavigation()
@@ -42,9 +41,9 @@ export default ({ route }) => {
   return (
     <FeatureContainer style={{ flex: 1 }}>
       <ScrollView contentContainerStyle={styles.formContainer}
-        refreshControl={<RefreshControl refreshing={cartQuery.isLoading || cartQuery.isFetching} onRefresh={cartQuery.refetch} />}
+        refreshControl={<RefreshControl refreshing={cartQuery.isLoading || cartQuery.isFetching || loading} onRefresh={cartQuery.refetch} />}
       >
-        {lines?.map(line => <OrderLine key={line.id} line={line} currencyData={currency} />)}
+        {lines?.map(line => <OrderLine key={line.id} line={line} currencyData={currency} loading={loading} setLoading={setLoading} />)}
         {/* <Text>={JSON.stringify(lines, null, 2)}</Text> */}
         {/* <Text>{JSON.stringify(cart, null, 2)}</Text> */}
         {/* <Text>{JSON.stringify(cart?.website_sale_order, null, 2)}</Text> */}
@@ -69,8 +68,9 @@ export default ({ route }) => {
   );
 };
 
-function OrderLine({ line, currencyData }) {
+function OrderLine({ line, currencyData, loading, setLoading }) {
   const theme = useTheme()
+  const helper = useCartMutationHelper({ line, setLoading })
   const line_update = {
     "line_id": 70,
     "product_id": 21,
@@ -78,7 +78,7 @@ function OrderLine({ line, currencyData }) {
     "display": true
   }
   function handleDeleteLine() {
-    // todo: implement me
+    helper.handleAddAsync(0)
   }
 
   return (
@@ -103,7 +103,7 @@ function OrderLine({ line, currencyData }) {
       }}>
         <Text>{line.name_short}</Text>
         <CustomSpacer height={8} />
-        <AddToCart line={line} />
+        <AddToCart line={line} loading={loading} helper={helper}/>
         <CustomSpacer height={8} />
         <View style={{
           flexDirection: 'row',
@@ -120,11 +120,9 @@ function OrderLine({ line, currencyData }) {
 
 type AddCartStateType = 'subtract' | 'qty' | 'add'
 
-function AddToCart({ line }) {
-  const [loading, setLoading] = useState(false)
+function AddToCart({ line, loading, helper }) {
   const qty = line.displayed_quantity ?? 0
   const [value, setValue] = React.useState<AddCartStateType>('add');
-  const [updateCartQueryFn, updateCartQuery] = odooApi.useUpdateCartMutation()
 
   function makeDiff(diff) {
     const newValue = Number(qty) + diff
@@ -144,26 +142,7 @@ function AddToCart({ line }) {
       newValue = makeDiff(1)
     }
     if (newValue !== undefined) {
-      handleAddAsync(newValue)
-    }
-  }
-
-  async function handleAddAsync(newQty) {
-    setLoading(true)
-    try {
-      const params = {
-        "line_id": line.id,
-        "product_id": line.product_id,
-        "set_qty": newQty,
-        "display": true
-      }
-      console.log('#params');
-      console.log(params);
-      const response = await updateCartQueryFn(params).unwrap()
-      console.log('#response');
-      console.log(JSON.stringify(response, null, 2));
-    } finally {
-      setLoading(false)
+      helper.handleAddAsync(newValue)
     }
   }
 
@@ -201,6 +180,33 @@ function AddToCart({ line }) {
       />
     </View>
   )
+}
+
+export function useCartMutationHelper({ line, setLoading=undefined }){
+  const [updateCartQueryFn, updateCartQuery] = odooApi.useUpdateCartMutation()
+  async function handleAddAsync(newQty) {
+    setLoading && setLoading(true)
+    try {
+      const params = {
+        "line_id": line.id,
+        "product_id": line.product_id,
+        "set_qty": newQty,
+        "display": true
+      }
+      console.log('#params');
+      console.log(params);
+      const response = await updateCartQueryFn(params).unwrap()
+      console.log('#response');
+      console.log(JSON.stringify(response, null, 2));
+    } finally {
+      setLoading && setLoading(false)
+    }
+  }
+  return {
+    handleAddAsync,
+    updateCartQueryFn,
+    updateCartQuery,
+  }
 }
 
 const styles = StyleSheet.create({
