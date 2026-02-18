@@ -87,7 +87,6 @@ function CategoriesNew() {
     productsHomeQuery.data?.categories
 
 
-
   // return <ScrollView contentContainerStyle={{
   //   flexDirection: 'row',
   // }}
@@ -125,7 +124,7 @@ function CategoriesNew() {
       </View> */}
       {categories_list?.length === 1 ?
         // why this? because when the only button is the back button in the FlatList/ScrollView, it doesn't render unless the view is touched, idkw
-        <View style={[styles.tmpFixStyle, {flexDirection: 'row'}]}>
+        <View style={[styles.tmpFixStyle, { flexDirection: 'row' }]}>
           <CategoryButton
             item={categories_list[0]}
             selectedCategory={selectedCategory}
@@ -150,19 +149,19 @@ function CategoriesNew() {
             // flexGrow: 0,
             // borderWidth: 1, borderColor: 'red',
           }}
-          >{categories_list.map(item =>
-            <CategoryButton
-              item={item}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={setSelectedCategory}
-              currentCategory={currentCategory}
-              key={
-                item.is_special_back ?
-                  `back.${item.id}.${Math.random()}`
-                  : item.id
-              }
-            />
-          )
+        >{categories_list?.map(item =>
+          <CategoryButton
+            item={item}
+            selectedCategory={selectedCategory}
+            setSelectedCategory={setSelectedCategory}
+            currentCategory={currentCategory}
+            key={
+              item.is_special_back ?
+                `back.${item.id}.${Math.random()}`
+                : item.id
+            }
+          />
+        )
           }
         </ScrollView>
       }
