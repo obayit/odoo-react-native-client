@@ -7,7 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import CartButton from "./CartButton";
 import { hitSlop16 } from "./Utils";
 
-export default function AppHeader() {
+export default function AppHeader({ hideCartButton = false }) {
   const navigation = useNavigation()
   const canGoBack = navigation.canGoBack()
   return (
@@ -25,7 +25,7 @@ export default function AppHeader() {
         onPress={() => navigation.canGoBack() && navigation.goBack()} />
         : null}
       <View style={{ flex: 1 }} />
-      <CartButton />
+      {hideCartButton ? null : <CartButton />}
     </View>
   )
 }

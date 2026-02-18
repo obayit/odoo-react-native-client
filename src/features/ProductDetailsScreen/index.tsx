@@ -14,6 +14,7 @@ import DebugView from '../../components/DebugView';
 import AmountText from '../../components/AmountText';
 import { CustomSpacer } from '../../components/Utils';
 import { useSelector } from 'react-redux';
+import AppHeader from '../../components/AppHeader';
 
 
 interface ProductConfigurationData {
@@ -373,6 +374,7 @@ export default function ProductDetailsScreen({ navigation, route }) {
 
   return (
     <FeatureContainer loading={isLoading}>
+      <AppHeader />
       <ScrollView contentContainerStyle={styles.scrollViewContentContainer}>
         <View style={{ flexDirection: 'row' }}>
           {/* <Text style={styles.debugSubtleText}>productConfig: {JSON.stringify(productConfig, null, 2)}{'\n'}{JSON.stringify(variantDebugQuery.data)}</Text> */}

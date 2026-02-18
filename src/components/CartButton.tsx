@@ -19,13 +19,14 @@ export default function CartButton() {
     <View style={{
       marginHorizontal: 8,
     }}>
-      <Badge style={{
+      {qty && qty !== 0 ? <Badge style={{
         position: 'absolute',
         top: 4,
         right: 0,
         zIndex: 10,
       }}>{qty}</Badge>
-      <IconButton icon='cart' onPress={navigateToCart} mode="contained"/>
+        : null}
+      <IconButton icon='cart' onPress={navigateToCart} mode="contained" />
     </View>
   )
 }

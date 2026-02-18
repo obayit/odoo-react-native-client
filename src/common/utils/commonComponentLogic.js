@@ -114,7 +114,7 @@ export function groupList(data_list, perGroup=2){
 }
 
 export function sumOfNumbers(data_list){
-  if(data_list === undefined || data_list === null){
+  if(data_list === undefined || data_list === null || data_list?.length === 0){
     return undefined
   }
   return data_list.reduce((howMuchSoFar,currentElementOfTheArray) => {

@@ -14,6 +14,8 @@ import { CustomSpacer, SectionHeader } from '../components/Utils';
 import AmountText from '../components/AmountText';
 import { ScreenNames } from '../navigation/navigation.constants';
 import AmountLine from '../components/AmountLine';
+import { Image } from 'expo-image';
+import AppHeader from '../components/AppHeader';
 
 
 export default ({ route }) => {
@@ -22,6 +24,7 @@ export default ({ route }) => {
   const cart = cartQuery.data?.cart_data ?? emptyObject;
   const navigation = useNavigation()
   const lines = cart?.website_sale_order?.website_order_line
+  const emptyCart = cart?.website_sale_order?.website_order_line?.length === 0
   const currency = cart?.currency
 
   const [paymentLoading, SetPaymentLoading] = useState(false)
@@ -32,41 +35,61 @@ export default ({ route }) => {
     const response = await fakePaymentQueryFn({}).unwrap()
     setTimeout(() => {
       SetPaymentLoading(false)
-      if(response?.order_id){
-        navigation.navigate(ScreenNames.OrderDetails, { recordId: response.order_id})
+      if (response?.order_id) {
+        navigation.navigate(ScreenNames.OrderDetails, { recordId: response.order_id })
       }
     }, 1500);
   }
 
   return (
     <FeatureContainer style={{ flex: 1 }}>
-      <ScrollView contentContainerStyle={styles.formContainer}
-        refreshControl={<RefreshControl refreshing={cartQuery.isLoading || cartQuery.isFetching || loading} onRefresh={cartQuery.refetch} />}
-      >
-        {lines?.map(line => <OrderLine key={line.id} line={line} currencyData={currency} loading={loading} setLoading={setLoading} />)}
-        {/* <Text>={JSON.stringify(lines, null, 2)}</Text> */}
-        {/* <Text>{JSON.stringify(cart, null, 2)}</Text> */}
-        {/* <Text>{JSON.stringify(cart?.website_sale_order, null, 2)}</Text> */}
-        {/* <Text>{JSON.stringify(cart?.website_sale_order?.website_order_line, null, 2)}</Text> */}
-        {/* {cartQuery.error ? <Text>{JSON.stringify(cartQuery.error, null, 2)}</Text> : null} */}
-        <View style={{
-          margin: 16,
-        }}>
-          <AmountLine title='Subtotal' amount={cart?.website_sale_order?.amount_untaxed} currencyData={currency}/>
-          <AmountLine title='Taxes' amount={cart?.website_sale_order?.amount_tax} currencyData={currency}/>
-          <AmountLine title='Total' amount={cart?.website_sale_order?.amount_total} currencyData={currency}/>
-        </View>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'flex-end',
-          marginTop: 8,
-        }}>
-          <Button onPress={handleCheckout} mode='contained' icon='credit-card' loading={paymentLoading}>Pay</Button>
-        </View>
-      </ScrollView>
+      <AppHeader hideCartButton={true}/>
+      {emptyCart ?
+        <EmptyCartDisplay />
+        :
+        <ScrollView contentContainerStyle={styles.formContainer}
+          refreshControl={<RefreshControl refreshing={cartQuery.isLoading || cartQuery.isFetching || loading} onRefresh={cartQuery.refetch} />}
+        >
+          {lines?.map(line => <OrderLine key={line.id} line={line} currencyData={currency} loading={loading} setLoading={setLoading} />)}
+          {/* <Text>={JSON.stringify(lines, null, 2)}</Text> */}
+          {/* <Text>{JSON.stringify(cart, null, 2)}</Text> */}
+          {/* <Text>{JSON.stringify(cart?.website_sale_order, null, 2)}</Text> */}
+          {/* <Text>{JSON.stringify(cart?.website_sale_order?.website_order_line, null, 2)}</Text> */}
+          {/* {cartQuery.error ? <Text>{JSON.stringify(cartQuery.error, null, 2)}</Text> : null} */}
+          <View style={{
+            margin: 16,
+          }}>
+            <AmountLine title='Subtotal' amount={cart?.website_sale_order?.amount_untaxed} currencyData={currency} />
+            <AmountLine title='Taxes' amount={cart?.website_sale_order?.amount_tax} currencyData={currency} />
+            <AmountLine title='Total' amount={cart?.website_sale_order?.amount_total} currencyData={currency} />
+          </View>
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'flex-end',
+            marginTop: 8,
+          }}>
+            <Button onPress={handleCheckout} mode='contained' icon='credit-card' loading={paymentLoading}>Pay</Button>
+          </View>
+        </ScrollView>
+      }
     </FeatureContainer>
   );
 };
+
+function EmptyCartDisplay() {
+  return (
+    <View style={{
+      justifyContent: 'center',
+      alignItems: 'center',
+    }}>
+      <Image
+        source={require('../../assets/empty-cart.png')}
+        style={styles.emptyDataImage}
+        resizeMode='contain'
+      />
+    </View>
+  )
+}
 
 function OrderLine({ line, currencyData, loading, setLoading }) {
   const theme = useTheme()
@@ -103,7 +126,7 @@ function OrderLine({ line, currencyData, loading, setLoading }) {
       }}>
         <Text>{line.name_short}</Text>
         <CustomSpacer height={8} />
-        <AddToCart line={line} loading={loading} helper={helper}/>
+        <AddToCart line={line} loading={loading} helper={helper} />
         <CustomSpacer height={8} />
         <View style={{
           flexDirection: 'row',
@@ -182,7 +205,7 @@ function AddToCart({ line, loading, helper }) {
   )
 }
 
-export function useCartMutationHelper({ line, setLoading=undefined }){
+export function useCartMutationHelper({ line, setLoading = undefined }) {
   const [updateCartQueryFn, updateCartQuery] = odooApi.useUpdateCartMutation()
   async function handleAddAsync(newQty) {
     setLoading && setLoading(true)
@@ -231,5 +254,10 @@ const styles = StyleSheet.create({
   },
   qtyText: {
     fontSize: 18,
+  },
+  emptyDataImage: {
+    height: 400,
+    width: '100%',
+    margin: 16,
   },
 });

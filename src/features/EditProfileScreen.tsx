@@ -15,6 +15,7 @@ import { CustomButton } from '../components/CustomButtons';
 import { useNavigation } from '@react-navigation/native';
 import SelectionInput from '../components/SelectionInput';
 import { CustomSpacer, SectionHeader } from '../components/Utils';
+import AppHeader from '../components/AppHeader';
 
 
 export default ({ route }) => {
@@ -115,6 +116,7 @@ export default ({ route }) => {
 
   return (
     <FeatureContainer style={{ flex: 1 }}>
+      <AppHeader />
       <ScrollView contentContainerStyle={styles.formContainer}
         refreshControl={<RefreshControl refreshing={submitQuery.isLoading} />}
       >

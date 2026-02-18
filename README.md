@@ -57,3 +57,5 @@ That is because an incompatible version of react-native-svg is installed, see th
 * SelectionInput (aka Dropdown)
   - first tab doesn't open the options menu!
 * if session expired, the app doesn't logout automatically (of course only public info is accessible)
+* missing cart pagination (if cart items are too many)
+* missing attribute pagination (if attribute values are too many)
