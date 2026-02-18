@@ -54,3 +54,9 @@ export const getShortenedNames = (names) => {
 export const onlyImageFiles = (remoteFile) => {
   return remoteFile && remoteFile.mimetype && remoteFile.mimetype.includes('image');
 }
+
+export function tryNumber(value){
+  try{
+    return Number(value)
+  } catch { return 0 }
+}

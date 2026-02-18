@@ -610,7 +610,6 @@ function ProductTemplateAttributes({ record, productConfig, setProductConfig, co
                 const extraPrice = extraPriceQuery.data?.find(item => item.id === ptav.id)
                 const hasExtraPrice = extraPrice?.id
                 return (
-                  <>
                     <TouchableOpacity style={styles.attrContainer} key={ptav.id} onPress={handleChange}>
                       {isRadio ?
                         <RadioButton
@@ -640,12 +639,11 @@ function ProductTemplateAttributes({ record, productConfig, setProductConfig, co
                       {isColor ? <View style={[styles.colorView, colorStyle]} /> : null}
                       {isPills ? null :
                         <View style={{ flexDirection: 'row', alignItems: 'center' } as ViewStyle}>
-                          <CustomText>{ptav.display_name} @{ptav.id}.{ptav.name}</CustomText>
+                          <CustomText>{ptav.name}</CustomText>
                           {hasExtraPrice ? <PriceExtraBadge extraPrice={extraPrice} /> : null}
                         </View>
                       }
                     </TouchableOpacity>
-                  </>
                 )
               }) : null}
             </View>
@@ -769,7 +767,7 @@ function AddToCart({ record, productConfig, setProductConfig, combinationQuery }
         onValueChange={handleOnPress}
         style={{
           width: 230,  // width must be specified, because otherwise it 
-          marginHorizontal: 5,
+          marginRight: 5,
         }}
         buttons={[
           {
@@ -816,7 +814,7 @@ const styles = StyleSheet.create({
     // borderWidth: 1, borderColor: 'purple',
   },
   addToCartContainer: {
-    marginHorizontal: 10,
+    marginHorizontal: 0,
     flexDirection: 'row',
     // height: 42,
   },
